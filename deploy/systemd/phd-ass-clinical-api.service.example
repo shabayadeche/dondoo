@@ -1,0 +1,30 @@
+[Unit]
+Description=PhD-Ass Clinical API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=phdass
+Group=phdass
+WorkingDirectory=/srv/phd-ass/current/services/clinical_api
+Environment=PYTHONPATH=/srv/phd-ass/current/services/clinical_api
+EnvironmentFile=/etc/phd-ass/clinical-api.env
+ExecStartPre=/srv/phd-ass/.venvs/phd-ass-clinical-api/bin/python -m alembic upgrade head
+ExecStart=/srv/phd-ass/.venvs/phd-ass-clinical-api/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+UMask=027
+
+[Install]
+WantedBy=multi-user.target

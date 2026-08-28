@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_phd_ass_procedure_room_endoscopist,access.phd.ass.procedure.room.endoscopist,model_phd_ass_procedure_room,phd_ass_bridge.group_phd_ass_endoscopist,1,0,0,0
+access_phd_ass_procedure_room_nurse,access.phd.ass.procedure.room.nurse,model_phd_ass_procedure_room,phd_ass_bridge.group_phd_ass_nurse,1,0,0,0
+access_phd_ass_procedure_room_operations_admin,access.phd.ass.procedure.room.operations.admin,model_phd_ass_procedure_room,phd_ass_bridge.group_phd_ass_operations_admin,1,1,1,1
+access_phd_ass_procedure_room_admin,access.phd.ass.procedure.room.admin,model_phd_ass_procedure_room,phd_ass_bridge.group_phd_ass_admin,1,1,1,1

@@ -1,0 +1,11 @@
+<svg width="360" height="96" viewBox="0 0 360 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Dondoo</title>
+  <desc id="desc">Dondoo rounded wordmark in teal</desc>
+  <g aria-hidden="true">
+    <rect x="8" y="16" width="18" height="64" rx="9" fill="#2F7B74"/>
+    <circle cx="44" cy="48" r="25" stroke="#2F7B74" stroke-width="12"/>
+    <circle cx="88" cy="48" r="17" stroke="#2F7B74" stroke-width="12"/>
+    <circle cx="124" cy="48" r="17" stroke="#2F7B74" stroke-width="12"/>
+    <text x="158" y="68" fill="#213043" font-family="Atkinson Hyperlegible Next, Segoe UI, sans-serif" font-size="56" font-weight="700" letter-spacing="-1.5">dondoo</text>
+  </g>
+</svg>

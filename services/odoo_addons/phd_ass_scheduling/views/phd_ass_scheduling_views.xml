@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_phd_ass_procedure_room_list" model="ir.ui.view">
+    <field name="name">phd.ass.procedure.room.list</field>
+    <field name="model">phd.ass.procedure.room</field>
+    <field name="arch" type="xml">
+      <list string="Procedure Rooms">
+        <field name="name"/>
+        <field name="code"/>
+        <field name="facility_id"/>
+        <field name="facility_unit_id"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_procedure_room_form" model="ir.ui.view">
+    <field name="name">phd.ass.procedure.room.form</field>
+    <field name="model">phd.ass.procedure.room</field>
+    <field name="arch" type="xml">
+      <form string="Procedure Room">
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="code"/>
+              <field name="active"/>
+            </group>
+            <group>
+              <field name="facility_id"/>
+              <field name="facility_unit_id" domain="[('facility_id', '=', facility_id)]"/>
+            </group>
+          </group>
+          <group>
+            <field name="note"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_schedule_list" model="ir.ui.view">
+    <field name="name">phd.ass.case.schedule.list</field>
+    <field name="model">phd.ass.case</field>
+    <field name="arch" type="xml">
+      <list string="Procedure Schedule">
+        <field name="name" readonly="1"/>
+        <field name="patient_identifier"/>
+        <field name="procedure_type"/>
+        <field name="schedule_state"/>
+        <field name="scheduled_start"/>
+        <field name="scheduled_end"/>
+        <field name="room_id"/>
+        <field name="prep_state"/>
+        <field name="check_in_at"/>
+        <field name="endoscopist_user_id"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_schedule_search" model="ir.ui.view">
+    <field name="name">phd.ass.case.schedule.search</field>
+    <field name="model">phd.ass.case</field>
+    <field name="arch" type="xml">
+      <search string="Procedure Schedule">
+        <field name="name"/>
+        <field name="patient_identifier"/>
+        <field name="room_id"/>
+        <field name="endoscopist_user_id"/>
+        <filter name="filter_scheduled" string="Scheduled" domain="[('schedule_state', '=', 'scheduled')]"/>
+        <filter name="filter_arrived" string="Arrived" domain="[('schedule_state', '=', 'arrived')]"/>
+        <filter name="filter_in_room" string="In Room" domain="[('schedule_state', '=', 'in_room')]"/>
+        <filter name="filter_open_day" string="Open Schedule" domain="[('schedule_state', 'in', ('scheduled', 'arrived', 'in_room'))]"/>
+        <separator/>
+        <filter name="group_room" string="Group By Room" context="{'group_by': 'room_id'}"/>
+        <filter name="group_endoscopist" string="Group By Endoscopist" context="{'group_by': 'endoscopist_user_id'}"/>
+        <filter name="group_facility" string="Group By Facility" context="{'group_by': 'facility_id'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_schedule_calendar" model="ir.ui.view">
+    <field name="name">phd.ass.case.schedule.calendar</field>
+    <field name="model">phd.ass.case</field>
+    <field name="arch" type="xml">
+      <calendar string="Procedure Schedule" date_start="scheduled_start" date_stop="scheduled_end" color="room_id">
+        <field name="name"/>
+        <field name="patient_identifier"/>
+        <field name="room_id"/>
+        <field name="schedule_state"/>
+        <field name="prep_state"/>
+      </calendar>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_form_scheduling" model="ir.ui.view">
+    <field name="name">phd.ass.case.form.scheduling</field>
+    <field name="model">phd.ass.case</field>
+    <field name="inherit_id" ref="phd_ass_bridge.view_phd_ass_case_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook/page[1]" position="after">
+        <page string="Scheduling">
+          <group>
+            <group>
+              <field name="schedule_state"/>
+              <field name="scheduled_start"/>
+              <field name="scheduled_end"/>
+              <field name="room_id"/>
+            </group>
+            <group>
+              <field name="prep_state"/>
+              <field name="check_in_at"/>
+              <field name="schedule_note"/>
+              <field name="arrival_note"/>
+            </group>
+          </group>
+          <group col="6" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin">
+            <button name="action_mark_scheduled" type="object" string="Mark Scheduled"/>
+            <button name="action_mark_arrived" type="object" string="Mark Arrived"/>
+            <button name="action_mark_in_room" type="object" string="In Room"/>
+            <button name="action_mark_schedule_complete" type="object" string="Complete"/>
+            <button name="action_mark_no_show" type="object" string="No Show"/>
+            <button name="action_mark_schedule_cancelled" type="object" string="Cancel"/>
+            <button name="action_reset_schedule_state" type="object" string="Reset"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_phd_ass_schedule_board" model="ir.actions.act_window">
+    <field name="name">Procedure Schedule</field>
+    <field name="res_model">phd.ass.case</field>
+    <field name="view_mode">calendar,list,form</field>
+    <field name="search_view_id" ref="view_phd_ass_case_schedule_search"/>
+  </record>
+
+  <record id="action_phd_ass_procedure_rooms" model="ir.actions.act_window">
+    <field name="name">Procedure Rooms</field>
+    <field name="res_model">phd.ass.procedure.room</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <menuitem id="menu_phd_ass_schedule_board" name="Procedure Schedule" parent="phd_ass_bridge.menu_phd_ass_root" action="action_phd_ass_schedule_board" sequence="12" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_procedure_rooms" name="Procedure Rooms" parent="phd_ass_bridge.menu_phd_ass_reference_data" action="action_phd_ass_procedure_rooms" sequence="30" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+</odoo>

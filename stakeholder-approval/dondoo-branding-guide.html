@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Dondoo Branding Guide</title>
+<style>
+@page{size:A4;margin:18mm 16mm 18mm}*{box-sizing:border-box}body{margin:0;color:#213043;background:#fffdf8;font:11pt/1.55 Arial,"Segoe UI",sans-serif}.logo{width:180px;height:auto;margin:0 0 16pt}h1{font-size:30pt;line-height:1.1;color:#214f58;margin:0 0 8pt;border-bottom:4px solid #2f7b74;padding-bottom:10pt}h2{font-size:18pt;color:#214f58;margin:24pt 0 7pt;border-bottom:1px solid #deece8;padding-bottom:4pt}h3{font-size:13pt;color:#2f7b74;margin:16pt 0 5pt}p{margin:0 0 9pt}ul{margin:3pt 0 11pt;padding-left:20pt}li{margin:3pt 0}a{color:#2f7b74;text-decoration:none}blockquote{margin:10pt 0;padding:9pt 12pt;background:#deece8;border-left:4px solid #2f7b74}code{font-family:Consolas,monospace;background:#f3ede3;padding:1pt 3pt;border-radius:3pt}pre{background:#213043;color:#fffdf8;padding:10pt;border-radius:7pt;white-space:pre-wrap}table{width:100%;border-collapse:collapse;margin:7pt 0 13pt;font-size:9.5pt;break-inside:avoid}th{background:#214f58;color:#fffdf8;text-align:left}th,td{border:1px solid #d9ddd9;padding:5pt 6pt;vertical-align:top}tr:nth-child(even){background:#f3ede3}strong{font-weight:700}h1+p{color:#667384;font-size:12pt}
+</style></head><body><img class="logo" src="../apps/pwa/public/brand/dondoo-logo.svg" alt="Dondoo logo"><h1>Dondoo branding guide</h1>
+<p>Version 1.0 · 28 August 2026</p>
+<p>This is the shared visual and verbal reference for the Dondoo PWA, Odoo workspace, reports, exported PDFs, and future patient-facing surfaces. It is designed for endoscopy teams who scan information quickly, work under interruption, and need the interface to feel trustworthy without becoming institutional or intimidating.</p>
+<h2>1. Brand position</h2>
+<p><strong>Promise:</strong> make every endoscopy record clear, connected, and ready for the next safe action.</p>
+<p><strong>Personality:</strong> calm, exact, human, dependable.</p>
+<p><strong>Experience goals</strong></p>
+<ul><li>A clinician should understand patient, procedure, owner, and status at a glance.</li><li>A nurse or coordinator should always know the next task and who owns it.</li><li>A patient should encounter plain, respectful language and no unnecessary alarm.</li><li>A reviewer should be able to distinguish draft, verified, and finalized information.</li></ul>
+<p>Avoid visual language that feels playful, luxury, emergency-room red, or like a generic finance dashboard.</p>
+<h2>2. Logo and naming</h2>
+<p>Use <strong>Dondoo</strong> as the product name, with a capital D in prose and the lowercase wordmark only where the supplied asset requires it. The mark represents a record moving through a continuous care pathway.</p>
+<p>Assets:</p>
+<ul><li><a href="../../apps/pwa/public/brand/dondoo-mark.svg">Dondoo mark</a></li><li><a href="../../apps/pwa/public/brand/dondoo-logo.svg">Dondoo logo lockup</a></li><li><a href="../../apps/pwa/public/brand/dondoo-app-icon.svg">Dondoo app icon</a></li></ul>
+<p>Rules:</p>
+<ul><li>Keep clear space equal to the width of the mark's stem.</li><li>Use the teal mark on light surfaces or the reversed mark on deep teal.</li><li>Never stretch, rotate, add a shadow, or place it over clinical imagery.</li><li>Do not use the logo to imply a clinical result or endorsement.</li></ul>
+<h2>3. Color tokens</h2>
+<p>Use semantic tokens in code; do not introduce one-off hex values in screens.</p>
+<table><thead><tr><th>Token</th><th>Hex</th><th>Role</th></tr></thead><tbody><tr><td>Canvas</td><td><code>#F4EFE8</code></td><td>Main app background</td></tr><tr><td>Canvas alt</td><td><code>#FAF6EF</code></td><td>Secondary background and page bands</td></tr><tr><td>Paper</td><td><code>#FFFDF8</code></td><td>Cards, forms, tables, reports</td></tr><tr><td>Paper soft</td><td><code>#F3EDE3</code></td><td>Quiet grouping surfaces</td></tr><tr><td>Ink</td><td><code>#213043</code></td><td>Headings and primary text</td></tr><tr><td>Slate</td><td><code>#667384</code></td><td>Supporting text and metadata</td></tr><tr><td>Teal</td><td><code>#2F7B74</code></td><td>Primary action, links, focus, brand</td></tr><tr><td>Teal deep</td><td><code>#214F58</code></td><td>Hover/pressed state and reversed surfaces</td></tr><tr><td>Teal soft</td><td><code>#DEEDE8</code></td><td>Selected or informational background</td></tr><tr><td>Success</td><td><code>#2F6D44</code></td><td>Confirmed, finalized, complete</td></tr><tr><td>Warning</td><td><code>#8A6208</code></td><td>Attention, due soon, incomplete</td></tr><tr><td>Critical</td><td><code>#9E4C43</code></td><td>Error, destructive, blocked</td></tr></tbody></table>
+<p>Accessibility rules:</p>
+<ul><li>Normal text must meet WCAG 2.2 AA contrast (4.5:1); large text must meet</li></ul>
+<p>3:1. Aim higher for clinical data and outdoor/tablet use.</p>
+<ul><li>Teal, success, warning, and critical are never the only indicator. Pair color</li></ul>
+<p>with a label, icon, or state text.</p>
+<ul><li>Use dark text on soft status backgrounds. Do not put small white text on</li></ul>
+<p>warning yellow.</p>
+<ul><li>Test the actual component state, including hover, focus, disabled, and errors.</li></ul>
+<p>The NHS service manual similarly requires consistent typography and at least 4.5:1 contrast for normal text; use its colour and typography guidance as a quality benchmark, not as a reason to copy NHS identity.</p>
+<h2>4. Typography</h2>
+<p>Primary typeface: <strong>Atkinson Hyperlegible Next</strong>, with <code>Segoe UI</code> as the local fallback. It is friendly at small sizes and remains legible in dense clinical lists.</p>
+<table><thead><tr><th>Style</th><th>Size</th><th>Weight</th><th>Use</th></tr></thead><tbody><tr><td>Display</td><td>32–40px</td><td>700</td><td>Login or workspace hero only</td></tr><tr><td>Page heading</td><td>24–30px</td><td>700</td><td>One per screen</td></tr><tr><td>Section heading</td><td>18–22px</td><td>700</td><td>Panels and clinical sections</td></tr><tr><td>Body</td><td>16px</td><td>400</td><td>Instructions and narrative</td></tr><tr><td>Control text</td><td>15–16px</td><td>600</td><td>Buttons, inputs, tabs</td></tr><tr><td>Metadata</td><td>13–14px</td><td>600</td><td>Dates, identifiers, timestamps</td></tr></tbody></table>
+<p>Use sentence case. Do not use all caps for patient information, warnings, or workflow actions. Keep line length near 60–75 characters and use short labels.</p>
+<h2>5. Layout and interaction</h2>
+<ul><li>Use an 8px spacing rhythm (8, 16, 24, 32px) with 12–16px card radii.</li><li>Keep patient context at the top: name/identifier, procedure, facility,</li></ul>
+<p>endoscopist, and status.</p>
+<ul><li>Give each panel one primary action. Secondary actions are quieter and grouped.</li><li>Use warm background surfaces for navigation and white paper surfaces for data.</li><li>Preserve the same hierarchy on mobile; do not hide patient identity or status</li></ul>
+<p>behind an overflow menu.</p>
+<ul><li>Make touch targets at least 44×44px and keep destructive actions separated.</li><li>Focus rings are visible teal outlines with a 2px offset; never remove them.</li><li>Motion is brief and functional (150–200ms). Never animate clinical results.</li></ul>
+<h2>6. Components</h2>
+<p><strong>Buttons:</strong> teal filled for the primary action, outlined/neutral for secondary, critical red only for irreversible actions. Labels describe the outcome: “Save draft”, “Submit for review”, “Finalize report”. Avoid “Click here”.</p>
+<p><strong>Status:</strong> show a text label plus an optional icon. Recommended labels are <code>Draft</code>, <code>In review</code>, <code>Changes requested</code>, <code>Finalized</code>, <code>Overdue</code>, and <code>Blocked</code>.</p>
+<p><strong>Forms:</strong> labels sit above fields; examples are separate helper text; errors are shown beside the field and summarized at the top. Never clear entered clinical data after validation fails.</p>
+<p><strong>Tables and queues:</strong> align identifiers and dates consistently, keep the status column near the patient context, and provide a visible empty state with the next action.</p>
+<p><strong>Confirmation:</strong> after saving or submitting, show an inline confirmation that states what happened and what comes next. Toasts may supplement this but must not be the only confirmation.</p>
+<h2>7. Clinical content and safety</h2>
+<ul><li>Prefer “Endoscopist”, “Facility”, “Procedure date”, and “Report status” over</li></ul>
+<p>internal database terms.</p>
+<ul><li>Use plain language and active voice. Explain an acronym the first time.</li><li>Never imply that a draft is a diagnosis or that an assignment is a completed</li></ul>
+<p>review.</p>
+<ul><li>Display timestamps with timezone where actions cross facilities.</li><li>Keep audit history readable: who, what, when, and previous/new value.</li><li>Patient identifiers should be masked in notifications and non-clinical previews.</li><li>Use respectful, person-first language and avoid blame in error copy.</li></ul>
+<h2>8. Imagery and iconography</h2>
+<p>The product is data-first. Prefer the mark, simple line icons, and restrained illustrations over stock clinical photography. Icons must have accessible labels and should reinforce, not replace, text. Do not use imagery that shows invasive procedures in login or empty states.</p>
+<h2>9. PWA and Odoo implementation</h2>
+<p>Both clients must consume the same semantic names:</p>
+<pre><code>canvas, canvasAlt, paper, paperSoft, ink, slate,
+teal, tealDeep, tealSoft, success, warning, critical</code></pre>
+<p>The PWA maps these to CSS custom properties in <code>apps/pwa/src/styles.css</code>. The shared package maps them in <code>packages/ui/src/tokens.ts</code>. The Odoo theme maps teal to <code>$o-brand-primary</code> and <code>$o-action</code>, with ink/slate for text and the warm canvas/paper values for webclient surfaces. Keep Odoo's functional semantics (success, warning, danger) but use the Dondoo values above.</p>
+<p>Before release, check both clients at 320px, 768px, and desktop widths; keyboard navigation; 200% zoom; reduced motion; and light/dim display conditions.</p>
+<h2>10. Governance checklist</h2>
+<p>Before adding a component or campaign asset, confirm:</p>
+<p>1. It uses an existing semantic token and type style. 2. Its purpose is understandable without color, icons, or animation. 3. It has a keyboard focus state and a text alternative. 4. It preserves patient context and does not expose more data than the role allows. 5. It has been reviewed at the PWA and Odoo breakpoints.</p>
+<p>Reference standards: <a href="https://service-manual.nhs.uk/design-system/styles/colour">NHS colour guidance</a>, <a href="https://service-manual.nhs.uk/design-system/styles/typography">NHS typography guidance</a>, and <a href="https://www.england.nhs.uk/long-read/accessible-information-standard-requirements-dapb1605/">NHS accessible information requirements</a>.</p></body></html>

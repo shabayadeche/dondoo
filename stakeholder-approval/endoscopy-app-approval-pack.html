@@ -1,0 +1,2693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endoscopy Reporting App Stakeholder Approval Pack</title>
+  <style>
+    :root {
+      --ink: #17324d;
+      --ink-soft: #4c647c;
+      --accent: #0f8b8d;
+      --accent-deep: #0a5d6b;
+      --accent-faint: #e7f5f4;
+      --warning: #f4b400;
+      --danger: #d1495b;
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --line: #d6dfe8;
+      --line-strong: #afbcc9;
+      --success: #2d7d46;
+      --shadow: 0 18px 40px rgba(23, 50, 77, 0.12);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      width: 100%;
+      min-height: calc(297mm - 28mm);
+      background: var(--surface);
+      padding: 28px 30px 24px;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    .cover {
+      background:
+        radial-gradient(circle at top right, rgba(15, 139, 141, 0.18), transparent 32%),
+        radial-gradient(circle at left bottom, rgba(23, 50, 77, 0.08), transparent 28%),
+        linear-gradient(145deg, #f4fbfb 0%, #ffffff 50%, #f7fafc 100%);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(15, 139, 141, 0.22);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      background: rgba(15, 139, 141, 0.08);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .cover h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+    }
+
+    .cover h1 {
+      margin-top: 22px;
+      font-size: 34px;
+      line-height: 1.08;
+      max-width: 540px;
+    }
+
+    .cover .subtitle {
+      margin-top: 16px;
+      max-width: 560px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .cover-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 30px;
+      margin-top: 34px;
+      align-items: start;
+    }
+
+    .summary-card,
+    .decision-card,
+    .callout,
+    .mini-card,
+    .approval-box,
+    .legend {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card {
+      padding: 22px;
+    }
+
+    .summary-card h3,
+    .decision-card h3,
+    .section-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-deep);
+      margin-bottom: 14px;
+    }
+
+    .summary-list,
+    .bullets,
+    .approval-list,
+    .decision-list {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.55;
+    }
+
+    .summary-list li,
+    .bullets li,
+    .approval-list li,
+    .decision-list li {
+      margin-bottom: 8px;
+    }
+
+    .decision-card {
+      padding: 22px;
+      background: linear-gradient(180deg, #f8fffe 0%, #ffffff 100%);
+    }
+
+    .decision-pill {
+      display: inline-block;
+      margin-top: 12px;
+      margin-right: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-faint);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .meta {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--ink-soft);
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+    }
+
+    h2 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .lead {
+      margin: 0 0 18px;
+      max-width: 680px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .callout {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .mini-card {
+      padding: 16px;
+      box-shadow: none;
+    }
+
+    .mini-card .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .mini-card .value {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .info-map {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+    }
+
+    .lane {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 16px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    .lane:last-child {
+      margin-bottom: 0;
+    }
+
+    .lane-title {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: #f0f5fa;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .lane-flow {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .node {
+      min-width: 122px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      font-weight: 600;
+      box-shadow: 0 8px 18px rgba(23, 50, 77, 0.06);
+      position: relative;
+    }
+
+    .node::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--line-strong);
+      border-right: 2px solid var(--line-strong);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .lane-flow .node:last-child::after {
+      display: none;
+    }
+
+    .screen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .screen-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: #f9fbfd;
+      padding: 16px;
+      break-inside: avoid;
+    }
+
+    .screen-card h3 {
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .screen-card p {
+      margin: 0 0 14px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .device {
+      position: relative;
+      background: #eef3f8;
+      border: 1px solid #cfd9e3;
+      overflow: hidden;
+    }
+
+    .desktop {
+      height: 250px;
+      border-radius: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .mobile {
+      width: 235px;
+      height: 420px;
+      margin: 0 auto;
+      border-radius: 34px;
+      padding: 12px;
+      background: #0d2237;
+      box-shadow: 0 22px 40px rgba(8, 25, 39, 0.22);
+    }
+
+    .mobile-screen {
+      height: 100%;
+      border-radius: 24px;
+      background: #f6f9fc;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chrome-bar {
+      height: 14px;
+      padding: 10px 12px 0;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d0d9e2;
+    }
+
+    .desktop-shell {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      height: calc(100% - 14px);
+      margin-top: 8px;
+    }
+
+    .nav-rail {
+      background: linear-gradient(180deg, #14314d 0%, #1f4265 100%);
+      padding: 14px 10px;
+    }
+
+    .nav-mark,
+    .nav-pill,
+    .nav-chip {
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-mark {
+      height: 24px;
+      margin-bottom: 18px;
+    }
+
+    .nav-pill {
+      height: 32px;
+      margin-bottom: 10px;
+    }
+
+    .nav-chip {
+      height: 20px;
+      opacity: 0.7;
+      margin-bottom: 8px;
+    }
+
+    .workspace {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 0.5fr;
+      gap: 10px;
+    }
+
+    .bar,
+    .tile,
+    .form-row,
+    .table-row,
+    .tag,
+    .button,
+    .progress-step,
+    .preview-box,
+    .mobile-card,
+    .mobile-line,
+    .mobile-tab {
+      border-radius: 10px;
+      border: 1px solid #d6e1ea;
+      background: #ffffff;
+    }
+
+    .bar {
+      height: 38px;
+    }
+
+    .button {
+      height: 38px;
+      background: linear-gradient(180deg, #0f8b8d 0%, #0a6d78 100%);
+      border: 0;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 12px;
+      min-height: 150px;
+    }
+
+    .panel {
+      padding: 12px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid #d6e1ea;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .progress-step {
+      height: 32px;
+      background: #f4f8fb;
+    }
+
+    .progress-step.active {
+      background: linear-gradient(180deg, #daf2f1 0%, #eef9f8 100%);
+      border-color: rgba(15, 139, 141, 0.4);
+    }
+
+    .form-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .form-row {
+      height: 28px;
+      background: #fbfdff;
+    }
+
+    .form-row.large {
+      height: 52px;
+    }
+
+    .tag-row,
+    .table-stack {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .tag {
+      width: 82px;
+      height: 26px;
+      background: #f1f7fb;
+    }
+
+    .table-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .table-row {
+      height: 28px;
+      background: #fcfeff;
+    }
+
+    .preview-box {
+      height: 100%;
+      min-height: 120px;
+      background: linear-gradient(180deg, #f8fbfe 0%, #ffffff 100%);
+      position: relative;
+    }
+
+    .preview-box::before,
+    .preview-box::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      height: 8px;
+      background: #dce8f2;
+      border-radius: 999px;
+    }
+
+    .preview-box::before {
+      top: 18px;
+    }
+
+    .preview-box::after {
+      top: 38px;
+      right: 68px;
+    }
+
+    .mobile-header {
+      height: 86px;
+      background: linear-gradient(180deg, #17324d 0%, #245174 100%);
+      padding: 18px 16px 0;
+      color: white;
+    }
+
+    .mobile-header .title {
+      width: 120px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      margin-bottom: 12px;
+    }
+
+    .mobile-header .sub {
+      width: 90px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .mobile-body {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mobile-card {
+      min-height: 72px;
+      background: #ffffff;
+      padding: 10px;
+    }
+
+    .mobile-line {
+      height: 10px;
+      background: #eef3f8;
+      margin-bottom: 8px;
+    }
+
+    .mobile-line.short {
+      width: 62%;
+    }
+
+    .mobile-line.tiny {
+      width: 40%;
+    }
+
+    .mobile-tabs {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .mobile-tab {
+      height: 42px;
+      background: #ffffff;
+    }
+
+    .label-strip {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .label-pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--accent-faint);
+      color: var(--accent-deep);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .roadmap {
+      margin-top: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .roadmap-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .roadmap-phase {
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #14314d 0%, #244866 100%);
+      color: #ffffff;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .roadmap-card {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .approval-box {
+      margin-top: 20px;
+      padding: 18px 20px;
+      box-shadow: none;
+    }
+
+    .approval-box h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .approval-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .sign-line {
+      margin-top: 24px;
+      border-top: 1px solid var(--line-strong);
+      padding-top: 8px;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-top: 12px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .field-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+      padding: 14px 15px;
+      break-inside: avoid;
+    }
+
+    .field-panel h3 {
+      font-size: 15px;
+      margin: 0 0 8px;
+      color: var(--accent-deep);
+    }
+
+    .field-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.42;
+    }
+
+    .field-list li {
+      margin-bottom: 6px;
+    }
+
+    .reference-note {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    a {
+      color: var(--accent-deep);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(10, 93, 107, 0.25);
+    }
+
+    .ref-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .ref-list li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="badge">Stakeholder Approval Pack</div>
+    <h1>Endoscopy Reporting App<br />Universal Web and Mobile Product Proposal</h1>
+    <p class="subtitle">
+      Concept package for approval of scope, user experience direction, platform strategy, and first-release delivery plan.
+      Prepared for clinical, operational, and technical stakeholders.
+    </p>
+
+    <div class="cover-grid">
+      <div class="summary-card">
+        <div class="section-title">What This Product Solves</div>
+        <ul class="summary-list">
+          <li>Standardizes procedure reporting for endoscopy across structured digital workflows</li>
+          <li>Reduces missing safety and quality fields at sign-off</li>
+          <li>Generates a clean narrative report from structured data</li>
+          <li>Tracks specimens, pathology follow-up, and communication tasks</li>
+          <li>Supports desktop, tablet, and phone from one shared product foundation</li>
+        </ul>
+      </div>
+
+      <div class="decision-card">
+        <div class="section-title">Approval Requested</div>
+        <ul class="decision-list">
+          <li>Approve universal `web + mobile` product direction</li>
+          <li>Approve phased rollout starting with colonoscopy MVP</li>
+          <li>Approve UI and UX approach shown in the mockups</li>
+          <li>Approve technical foundation for one shared app and backend</li>
+        </ul>
+        <span class="decision-pill">Web + iPhone + Android</span>
+        <span class="decision-pill">Shared Codebase</span>
+        <span class="decision-pill">Clinical Workflow MVP</span>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Document date: August 17, 2026</span>
+      <span>Prepared from current planning baseline</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Executive Summary</span>
+    <h2>What Will Be Built</h2>
+    <p class="lead">
+      The proposed product is a structured endoscopy reporting application that runs as both a website app and a mobile app from the same codebase. The primary documentation surface is desktop or tablet inside the unit; mobile extends the same product for quick review, draft completion, task follow-up, and sign-off.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Primary users</span>
+        <div class="value">Endoscopists, nurses, unit admin</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Pilot release</span>
+        <div class="value">Colonoscopy MVP with shared workflow engine</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Platforms</span>
+        <div class="value">Web, iPhone, Android</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Why This Shape Is Recommended</strong>
+        <ul class="bullets">
+          <li>Long clinical documentation is easier on desktop and tablet</li>
+          <li>Shared product logic keeps validation, reporting, and audit rules consistent</li>
+          <li>One backend prevents fragmented patient, case, and follow-up data</li>
+          <li>Mobile remains valuable without forcing clinicians into small-screen long-form entry</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>What Is Not Included In V1</strong>
+        <ul class="bullets">
+          <li>Full EMR replacement</li>
+          <li>Billing and coding workflows</li>
+          <li>Deep external system integrations</li>
+          <li>ERCP and EUS modules in the first release</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-map">
+      <div class="section-title">Shared Workflow Architecture</div>
+      <div class="lane">
+        <div class="lane-title">Case Setup</div>
+        <div class="lane-flow">
+          <div class="node">Patient Search</div>
+          <div class="node">Procedure Type</div>
+          <div class="node">Staff Assignment</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Documentation</div>
+        <div class="lane-flow">
+          <div class="node">Safety Checks</div>
+          <div class="node">Procedure Details</div>
+          <div class="node">Findings</div>
+          <div class="node">Specimens</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Completion</div>
+        <div class="lane-flow">
+          <div class="node">Impression</div>
+          <div class="node">Generated Note</div>
+          <div class="node">Sign-Off</div>
+          <div class="node">Follow-Up Tasks</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 1 of 23</span>
+      <span>Approval focus: product boundary and operating model</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Scope Detail</span>
+    <h2>Users, Responsibilities, And MVP Boundaries</h2>
+    <p class="lead">
+      This section clarifies who the product is for, what the first release must cover, and which decisions need confirmation before implementation starts. It is intended to reduce scope ambiguity before approval.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Primary roles</span>
+        <div class="value">Endoscopist, nurse, unit administrator</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Pilot module</span>
+        <div class="value">Colonoscopy with shared workflow engine</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Later phases</span>
+        <div class="value">EGD next, then ERCP and EUS</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Primary Roles And Expected Use</strong>
+        <ul class="bullets">
+          <li><strong>Endoscopist:</strong> completes findings, impression, recommendations, and final sign-off</li>
+          <li><strong>Nurse or assistant:</strong> prepares shared safety data, staff details, and specimen support fields</li>
+          <li><strong>Unit administrator:</strong> manages users, templates, and report retrieval</li>
+          <li><strong>Quality reviewer:</strong> phase-two role for operational reporting and audit review</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Procedure Rollout Scope</strong>
+        <ul class="bullets">
+          <li><strong>Phase 1:</strong> colonoscopy to validate core workflow, structured findings, and follow-up model</li>
+          <li><strong>Phase 2:</strong> EGD reusing the same workflow, reporting, and sign-off foundation</li>
+          <li><strong>Phase 3:</strong> ERCP and EUS after core adoption, because they introduce greater complexity</li>
+          <li><strong>Common sections:</strong> patient, safety, procedure details, findings, specimens, impression, report, sign-off</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>MVP Must Support</strong>
+        <ul class="bullets">
+          <li>Fast case start with patient lookup or entry</li>
+          <li>Mandatory preprocedure safety and consent capture</li>
+          <li>Structured colonoscopy findings and lesion logging</li>
+          <li>Specimen recording and follow-up task creation</li>
+          <li>Draft autosave, final sign-off, and locked reports</li>
+          <li>Printable and exportable final procedure note</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Decisions Needed Before Build</strong>
+        <ul class="bullets">
+          <li>Will patient demographics be entered locally or sourced from another system?</li>
+          <li>Which identifiers are legally mandatory on every final report?</li>
+          <li>What form of digital sign-off is required for local approval?</li>
+          <li>Who owns pathology and communication closure tasks?</li>
+          <li>Will the first pilot rely mainly on desktop, tablet, or both?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 2 of 23</span>
+      <span>Approval focus: exact scope, roles, and local decision points</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">UX Direction</span>
+    <h2>Experience Principles And Layout Strategy</h2>
+    <p class="lead">
+      The interface should feel calm, clinical, and efficient. The user experience is built around guided completion, progressive disclosure, visible save state, and low-friction sign-off.
+    </p>
+
+    <div class="two-col">
+      <div class="callout">
+        <strong>Core UX Principles</strong>
+        <ul class="bullets">
+          <li>Never present the entire procedure form at once</li>
+          <li>Use a stepper with explicit completion states</li>
+          <li>Highlight only the missing fields that block sign-off</li>
+          <li>Generate narrative documentation from structured inputs</li>
+          <li>Make draft save and final lock state visible at all times</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Platform Behavior</strong>
+        <ul class="bullets">
+          <li>Web and tablet prioritize complete procedure authoring</li>
+          <li>Mobile prioritizes quick review, tasks, and targeted edits</li>
+          <li>The same case, rules, and data should appear consistently across devices</li>
+          <li>Critical actions should use strong confirmations and audit logging</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="screen-grid" style="margin-top: 22px;">
+      <div class="screen-card">
+        <h3>Web Information Density</h3>
+        <p>Desktop supports a guided two-panel layout: data entry on the left, live narrative preview on the right.</p>
+        <div class="device desktop">
+          <div class="chrome-bar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="desktop-shell">
+            <div class="nav-rail">
+              <div class="nav-mark"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+            </div>
+            <div class="workspace">
+              <div class="topbar">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="button"></div>
+              </div>
+              <div class="panel-grid">
+                <div class="panel">
+                  <div class="stepper">
+                    <div class="progress-step active"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                  </div>
+                  <div class="form-stack">
+                    <div class="form-row"></div>
+                    <div class="form-row"></div>
+                    <div class="form-row large"></div>
+                    <div class="tag-row">
+                      <div class="tag"></div>
+                      <div class="tag"></div>
+                      <div class="tag"></div>
+                    </div>
+                    <div class="table-stack">
+                      <div class="table-row"></div>
+                      <div class="table-row"></div>
+                      <div class="table-row"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="preview-box"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="label-strip">
+          <span class="label-pill">Stepper workflow</span>
+          <span class="label-pill">Live preview</span>
+          <span class="label-pill">Structured entry</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>Mobile Focus Layout</h3>
+        <p>Mobile compresses the experience into task-first screens with strong calls to action and simplified sections.</p>
+        <div class="device mobile">
+          <div class="mobile-screen">
+            <div class="mobile-header">
+              <div class="title"></div>
+              <div class="sub"></div>
+            </div>
+            <div class="mobile-body">
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+            </div>
+            <div class="mobile-tabs">
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+            </div>
+          </div>
+        </div>
+        <div class="label-strip">
+          <span class="label-pill">Single-column flow</span>
+          <span class="label-pill">Task-focused</span>
+          <span class="label-pill">Large touch targets</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 3 of 23</span>
+      <span>Approval focus: user experience principles and responsive behavior</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Desktop Mockups</span>
+    <h2>Key Web And Tablet Screens</h2>
+    <p class="lead">
+      These layouts show how the app should behave on larger screens used inside the endoscopy unit. The visual language is clean, high-contrast, and task-focused rather than decorative.
+    </p>
+
+    <div class="screen-grid">
+      <div class="screen-card">
+        <h3>1. Dashboard</h3>
+        <p>Quick visibility into active drafts, pending tasks, recent finalized reports, and common actions.</p>
+        <div class="device desktop">
+          <div class="chrome-bar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="desktop-shell">
+            <div class="nav-rail">
+              <div class="nav-mark"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+            </div>
+            <div class="workspace">
+              <div class="topbar">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="button"></div>
+              </div>
+              <div class="three-col">
+                <div class="mini-card" style="height:72px;"></div>
+                <div class="mini-card" style="height:72px;"></div>
+                <div class="mini-card" style="height:72px;"></div>
+              </div>
+              <div class="panel-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="panel">
+                  <div class="table-stack">
+                    <div class="table-row"></div>
+                    <div class="table-row"></div>
+                    <div class="table-row"></div>
+                    <div class="table-row"></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="table-stack">
+                    <div class="table-row"></div>
+                    <div class="table-row"></div>
+                    <div class="table-row"></div>
+                    <div class="table-row"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>2. New Procedure Start</h3>
+        <p>Fast start with patient search, procedure type selection, and staff assignment before entering the workflow.</p>
+        <div class="device desktop">
+          <div class="chrome-bar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="desktop-shell">
+            <div class="nav-rail">
+              <div class="nav-mark"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+            </div>
+            <div class="workspace">
+              <div class="panel" style="height: 188px;">
+                <div class="form-stack">
+                  <div class="form-row large"></div>
+                  <div class="tag-row">
+                    <div class="tag"></div>
+                    <div class="tag"></div>
+                    <div class="tag"></div>
+                    <div class="tag"></div>
+                  </div>
+                  <div class="form-row"></div>
+                  <div class="form-row"></div>
+                </div>
+              </div>
+              <div class="topbar">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="button"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>3. Procedure Workspace</h3>
+        <p>The main authoring surface combines a stepper, structured fields, findings tables, and live report preview.</p>
+        <div class="device desktop">
+          <div class="chrome-bar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="desktop-shell">
+            <div class="nav-rail">
+              <div class="nav-mark"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+            </div>
+            <div class="workspace">
+              <div class="topbar">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="button"></div>
+              </div>
+              <div class="panel-grid">
+                <div class="panel">
+                  <div class="stepper">
+                    <div class="progress-step active"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                  </div>
+                  <div class="form-stack">
+                    <div class="form-row"></div>
+                    <div class="form-row"></div>
+                    <div class="form-row"></div>
+                    <div class="table-stack">
+                      <div class="table-row"></div>
+                      <div class="table-row"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="preview-box"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>4. Review And Sign-Off</h3>
+        <p>A focused final screen shows missing blockers, the generated report, and explicit signature confirmation.</p>
+        <div class="device desktop">
+          <div class="chrome-bar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="desktop-shell">
+            <div class="nav-rail">
+              <div class="nav-mark"></div>
+              <div class="nav-pill"></div>
+              <div class="nav-chip"></div>
+              <div class="nav-chip"></div>
+            </div>
+            <div class="workspace">
+              <div class="panel-grid" style="grid-template-columns: 0.78fr 1.22fr;">
+                <div class="panel">
+                  <div class="form-stack">
+                    <div class="form-row large"></div>
+                    <div class="form-row"></div>
+                    <div class="form-row"></div>
+                    <div class="button" style="margin-top: 18px;"></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="preview-box"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 4 of 23</span>
+      <span>Approval focus: workstation layout and authoring flow</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Mobile Mockups</span>
+    <h2>Key Mobile Screens</h2>
+    <p class="lead">
+      Mobile is part of the same application, but the flow is intentionally simplified. It should support continuity, follow-up, and targeted actions without forcing the entire desktop workload into a small screen.
+    </p>
+
+    <div class="screen-grid">
+      <div class="screen-card">
+        <h3>1. Mobile Home</h3>
+        <p>Shows drafts, pending tasks, and quick actions for common in-unit follow-up work.</p>
+        <div class="device mobile">
+          <div class="mobile-screen">
+            <div class="mobile-header">
+              <div class="title"></div>
+              <div class="sub"></div>
+            </div>
+            <div class="mobile-body">
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+              </div>
+            </div>
+            <div class="mobile-tabs">
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>2. Task Queue</h3>
+        <p>Optimized for pending communication, pathology, and specimen-related follow-up actions.</p>
+        <div class="device mobile">
+          <div class="mobile-screen">
+            <div class="mobile-header">
+              <div class="title"></div>
+              <div class="sub"></div>
+            </div>
+            <div class="mobile-body">
+              <div class="tag-row" style="margin-top: 0;">
+                <div class="tag" style="width: 70px;"></div>
+                <div class="tag" style="width: 54px;"></div>
+                <div class="tag" style="width: 64px;"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+            </div>
+            <div class="mobile-tabs">
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>3. Case Review</h3>
+        <p>Provides key case status, critical patient details, and direct entry points into incomplete sections.</p>
+        <div class="device mobile">
+          <div class="mobile-screen">
+            <div class="mobile-header">
+              <div class="title"></div>
+              <div class="sub"></div>
+            </div>
+            <div class="mobile-body">
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="button" style="height: 34px; margin-top: 10px;"></div>
+              </div>
+            </div>
+            <div class="mobile-tabs">
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <h3>4. Sign-Off On Mobile</h3>
+        <p>Used for targeted review and final approval where full desktop editing is not required.</p>
+        <div class="device mobile">
+          <div class="mobile-screen">
+            <div class="mobile-header">
+              <div class="title"></div>
+              <div class="sub"></div>
+            </div>
+            <div class="mobile-body">
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line short"></div>
+                <div class="mobile-line tiny"></div>
+              </div>
+              <div class="mobile-card">
+                <div class="mobile-line"></div>
+                <div class="mobile-line"></div>
+                <div class="button" style="height: 36px; margin-top: 14px;"></div>
+              </div>
+            </div>
+            <div class="mobile-tabs">
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+              <div class="mobile-tab"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 5 of 23</span>
+      <span>Approval focus: mobile role and screen simplification strategy</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Architecture And Governance</span>
+    <h2>System Foundation, Controls, And Success Measures</h2>
+    <p class="lead">
+      Stakeholder approval should cover not only the screens, but also the operating controls that make the product clinically reliable: shared data rules, locked final records, auditability, and measurable outcomes.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Frontend model</span>
+        <div class="value">One universal app for web, iPhone, and Android</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Backend model</span>
+        <div class="value">Shared API, database, audit log, and report service</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Clinical control</span>
+        <div class="value">Versioned templates and locked finalized records</div>
+      </div>
+    </div>
+
+    <div class="info-map" style="margin-top: 18px;">
+      <div class="section-title">Recommended Operating Architecture</div>
+      <div class="lane">
+        <div class="lane-title">Client</div>
+        <div class="lane-flow">
+          <div class="node">Web App</div>
+          <div class="node">Tablet Use</div>
+          <div class="node">Mobile App</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Platform</div>
+        <div class="lane-flow">
+          <div class="node">Authentication</div>
+          <div class="node">Case APIs</div>
+          <div class="node">Report Engine</div>
+          <div class="node">Task Queue</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Data Control</div>
+        <div class="lane-flow">
+          <div class="node">Structured Data</div>
+          <div class="node">Audit Log</div>
+          <div class="node">PDF Archive</div>
+          <div class="node">Template Versioning</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Governance And Security Controls</strong>
+        <ul class="bullets">
+          <li>Every create, edit, finalize, and close action must be audit logged</li>
+          <li>Finalized reports must be locked and not silently editable</li>
+          <li>Each finalized report must preserve the template version used at sign-off</li>
+          <li>Role-based access should limit who can finalize, reopen, or administer templates</li>
+          <li>Specimen, pathology, and communication events should be time-stamped and attributable</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Success Measures For The Pilot</strong>
+        <ul class="bullets">
+          <li>More than 95% completion of mandatory fields on finalized reports</li>
+          <li>More than 90% same-day finalization for completed procedures</li>
+          <li>Median documentation completion time below five minutes after the procedure</li>
+          <li>All specimen-bearing cases linked to a follow-up state or closure record</li>
+          <li>Zero final record changes without audit trace</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Operational Dependencies</strong>
+        <ul class="bullets">
+          <li>Availability of devices in procedure and recovery areas</li>
+          <li>Agreement on local mandatory report content</li>
+          <li>Pilot users willing to validate real workflow timing</li>
+          <li>Defined owner for user administration and template governance</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Main Delivery Risks</strong>
+        <ul class="bullets">
+          <li>Scope creep into EMR, scheduling, or billing functions</li>
+          <li>Overloading mobile with desktop-style long-form entry</li>
+          <li>Weak analytics if critical fields are left as free text</li>
+          <li>Late sign-off rules causing rework in report generation and locking logic</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 6 of 23</span>
+      <span>Approval focus: architecture, controls, and measurable outcomes</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Workflow Scenarios</span>
+    <h2>How The Product Fits The Clinical Day</h2>
+    <p class="lead">
+      Stakeholders should approve not only the screens but also the practical workflow model. The product is designed to fit the real sequence of work before, during, and after the procedure while allowing interruption and resumption.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Scenario 1</span>
+        <div class="value">Routine colonoscopy documented on desktop or tablet</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Scenario 2</span>
+        <div class="value">Draft resumed after interruption without losing structure</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Scenario 3</span>
+        <div class="value">Specimen and communication tasks closed on mobile</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Primary Authoring Scenario</strong>
+        <ul class="bullets">
+          <li>Staff start the case with patient, procedure, and team details</li>
+          <li>Shared safety and consent fields are captured before or at procedure start</li>
+          <li>The endoscopist records findings using structured selections and lesion rows</li>
+          <li>The report preview updates as structured content is completed</li>
+          <li>The final report is signed, locked, and ready for print or export</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Continuity Scenario Across Devices</strong>
+        <ul class="bullets">
+          <li>A draft begun on web or tablet can be reviewed later on mobile</li>
+          <li>Mobile focuses on targeted completion rather than full long-form entry</li>
+          <li>Pending specimen and pathology tasks surface directly in the task queue</li>
+          <li>Communication and closure actions remain attributable to the acting user</li>
+          <li>All platforms reflect the same record state in real time</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-map" style="margin-top: 18px;">
+      <div class="section-title">End-To-End Case Journey</div>
+      <div class="lane">
+        <div class="lane-title">Before Procedure</div>
+        <div class="lane-flow">
+          <div class="node">Patient Lookup</div>
+          <div class="node">Procedure Selection</div>
+          <div class="node">Safety Checks</div>
+          <div class="node">Consent</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">During Procedure</div>
+        <div class="lane-flow">
+          <div class="node">Procedure Details</div>
+          <div class="node">Findings</div>
+          <div class="node">Lesions</div>
+          <div class="node">Specimens</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">After Procedure</div>
+        <div class="lane-flow">
+          <div class="node">Impression</div>
+          <div class="node">Generated Note</div>
+          <div class="node">Sign-Off</div>
+          <div class="node">Print Or PDF</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Follow-Up</div>
+        <div class="lane-flow">
+          <div class="node">Task Queue</div>
+          <div class="node">Pathology Review</div>
+          <div class="node">Communication</div>
+          <div class="node">Closure</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 7 of 23</span>
+      <span>Approval focus: operational fit across the clinical day</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Data And Outputs</span>
+    <h2>What The System Captures And What It Produces</h2>
+    <p class="lead">
+      The business value of the product depends on structured capture and useful outputs. This page clarifies which data is expected to be captured and what stakeholders should expect the system to produce from it.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Shared data</span>
+        <div class="value">Patient, safety, staff, timing, sign-off, follow-up</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Procedure data</span>
+        <div class="value">Findings, lesion logs, therapy, specimens, recommendations</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Outputs</span>
+        <div class="value">Narrative note, PDF, task queue, quality-ready dataset</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Structured Data Categories</strong>
+        <ul class="bullets">
+          <li>Patient and encounter identifiers</li>
+          <li>Preprocedure safety, consent, allergies, and medication-related data</li>
+          <li>Procedure completeness, insertion details, bowel preparation, and findings</li>
+          <li>Polyp, lesion, biopsy, and specimen-level records where applicable</li>
+          <li>Final impression, recommendations, and communication status</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>User-Facing Outputs</strong>
+        <ul class="bullets">
+          <li>Readable procedure note generated from structured content</li>
+          <li>Printable or exportable PDF for the medical record</li>
+          <li>Open tasks for pathology, specimen, and communication follow-up</li>
+          <li>Filtered report search for retrieval by case, patient, date, or procedure type</li>
+          <li>Future quality dashboards built from the same structured record</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Why Structured Capture Matters</strong>
+        <ul class="bullets">
+          <li>Prevents key quality indicators from being hidden in narrative text</li>
+          <li>Improves consistency between users and procedure sessions</li>
+          <li>Supports later reporting and audit without manual spreadsheet extraction</li>
+          <li>Allows the narrative note to be generated rather than typed from scratch</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Record And Audit Expectations</strong>
+        <ul class="bullets">
+          <li>Every finalized report should remain reproducible in its signed form</li>
+          <li>Every meaningful change should be attributable to a user and timestamp</li>
+          <li>Closed-loop follow-up should show both the action and the outcome</li>
+          <li>Template changes should not silently alter older finalized records</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-map" style="margin-top: 18px;">
+      <div class="section-title">Closed-Loop Reporting Model</div>
+      <div class="lane">
+        <div class="lane-title">Input</div>
+        <div class="lane-flow">
+          <div class="node">Structured Fields</div>
+          <div class="node">Lesion Logs</div>
+          <div class="node">Specimen Records</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Output</div>
+        <div class="lane-flow">
+          <div class="node">Narrative Report</div>
+          <div class="node">PDF Archive</div>
+          <div class="node">Follow-Up Tasks</div>
+        </div>
+      </div>
+      <div class="lane">
+        <div class="lane-title">Review</div>
+        <div class="lane-flow">
+          <div class="node">Case Retrieval</div>
+          <div class="node">Audit Review</div>
+          <div class="node">Quality Reporting</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 8 of 23</span>
+      <span>Approval focus: information value and report outputs</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Delivery Readiness</span>
+    <h2>Recommended Team, Timeline, And Start Conditions</h2>
+    <p class="lead">
+      Approval is stronger when the expected build model is explicit. This page outlines the likely team shape, indicative timing, and the conditions that should be in place before development starts.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Indicative MVP window</span>
+        <div class="value">8 to 13 weeks for foundation plus colonoscopy pilot</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Minimum pilot team</span>
+        <div class="value">Product lead, designer, full-stack engineer, clinical sponsor</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Go-live condition</span>
+        <div class="value">Approved workflow, field list, pilot users, and governance owner</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Suggested Delivery Team</strong>
+        <ul class="bullets">
+          <li>Product lead to control scope and approvals</li>
+          <li>UX and UI designer to define flows, wireframes, and interaction states</li>
+          <li>Full-stack engineer to build the universal app and backend foundation</li>
+          <li>Clinical sponsor to validate mandatory fields and report usefulness</li>
+          <li>Pilot users from the unit to test real-world completion speed</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Indicative Delivery Sequence</strong>
+        <ul class="bullets">
+          <li>Weeks 1 to 2: workflow confirmation, PRD, field definitions, and wireframes</li>
+          <li>Weeks 3 to 4: app shell, authentication, roles, audit log, and shared data model</li>
+          <li>Weeks 5 to 8: colonoscopy workflow, report generation, specimens, and tasks</li>
+          <li>Weeks 9 to 13: pilot hardening, performance, usability refinement, and release readiness</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Immediate Deliverables After Approval</strong>
+        <ul class="bullets">
+          <li>Detailed PRD and prioritized backlog</li>
+          <li>Field-level data dictionary for shared and colonoscopy sections</li>
+          <li>Build-ready wireframes for web and mobile</li>
+          <li>Database schema and report template design</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Conditions To Start Confidently</strong>
+        <ul class="bullets">
+          <li>Named business and clinical approvers</li>
+          <li>Agreement on pilot site and pilot users</li>
+          <li>Decision on local identifiers and sign-off rules</li>
+          <li>Availability of test devices for desktop, tablet, and mobile review</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="approval-box">
+      <h3>Recommended Approval Checklist</h3>
+      <ul class="approval-list">
+        <li>Approve the universal app direction and phased rollout</li>
+        <li>Approve colonoscopy as the first live module</li>
+        <li>Approve the UI and UX direction shown in the mockups</li>
+        <li>Nominate clinical and operational owners for field and sign-off decisions</li>
+        <li>Approve the creation of the detailed PRD, wireframes, and schema as the next project step</li>
+      </ul>
+    </div>
+
+    <div class="meta">
+      <span>Section 9 of 23</span>
+      <span>Approval focus: delivery readiness and start conditions</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Business Case</span>
+    <h2>Why This Project Should Be Approved</h2>
+    <p class="lead">
+      The strongest reason to fund this product is operational: structured reporting reduces avoidable documentation variability, makes quality measures easier to retrieve, and creates a cleaner follow-up chain for pathology, communication, and surveillance planning.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Current-state risk</span>
+        <div class="value">Inconsistent reports, missed fields, weak auditability</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Operational gain</span>
+        <div class="value">Faster reporting with more structured completeness</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Strategic gain</span>
+        <div class="value">Quality-ready data without parallel spreadsheet work</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Problems This Investment Addresses</strong>
+        <ul class="bullets">
+          <li>Procedure reports may vary significantly between users and sessions</li>
+          <li>Key safety and quality items may be omitted or buried in free text</li>
+          <li>Specimen and pathology follow-up may rely too heavily on informal reminders</li>
+          <li>Quality review often becomes manual because data is not captured in a reusable structure</li>
+          <li>Desktop and mobile continuity is weak when teams rely on disconnected tools</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Value Stakeholders Can Expect</strong>
+        <ul class="bullets">
+          <li>Cleaner and more consistent endoscopy documentation</li>
+          <li>Higher completion of mandatory fields before sign-off</li>
+          <li>Faster report finalization after procedures</li>
+          <li>Better visibility into follow-up ownership and closure status</li>
+          <li>A scalable foundation for later modules, dashboards, and integrations</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="approval-box">
+      <h3>Funding Logic</h3>
+      <p class="reference-note">
+        This proposal should be approved as a workflow, quality, and governance project rather than only as a form digitization effort. The long-term return comes from repeatable documentation, lower review friction, easier quality reporting, and safer closed-loop follow-up.
+      </p>
+    </div>
+
+    <div class="meta">
+      <span>Section 10 of 23</span>
+      <span>Approval focus: rationale, expected value, and funding case</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Compliance And Integration</span>
+    <h2>Security, Legal, And Technical Assumptions</h2>
+    <p class="lead">
+      Stakeholders should approve the assumptions that shape compliance and integration work. These are not legal determinations; they are the operating controls and questions that must be resolved before production use.
+    </p>
+
+    <div class="two-col">
+      <div class="callout">
+        <strong>Compliance And Governance Topics</strong>
+        <ul class="bullets">
+          <li>Protected health information handling and access control</li>
+          <li>Audit trail retention for create, edit, finalize, and closure actions</li>
+          <li>Rules for digital sign-off and whether finalized records may ever be reopened</li>
+          <li>Document retention requirements and export or archive expectations</li>
+          <li>Device, session, and password policies for desktop, tablet, and mobile use</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Integration Assumptions To Confirm</strong>
+        <ul class="bullets">
+          <li>Patient demographics source: local entry, EMR feed, or hybrid model</li>
+          <li>Pathology workflow: manual entry, LIS interface, or future integration</li>
+          <li>Identity and authentication: local accounts, SSO, or directory service</li>
+          <li>Report delivery: PDF export only, printer workflow, or EMR attachment</li>
+          <li>Notifications: in-app only, email, SMS, or institution-approved messaging</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Non-Functional Expectations</strong>
+        <ul class="bullets">
+          <li>Responsive performance on standard unit hardware</li>
+          <li>Reliable backup and restore process</li>
+          <li>Defined downtime procedure and recovery plan</li>
+          <li>Supported browser, tablet, and mobile device list</li>
+          <li>Future option for offline draft capability if the environment requires it</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Approval Note</strong>
+        <ul class="bullets">
+          <li>This product plan assumes a formal compliance review before production launch</li>
+          <li>Local legal, privacy, and record-management requirements must be confirmed by the organization</li>
+          <li>The product should not be treated as approved for production solely because the design pack is approved</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 11 of 23</span>
+      <span>Approval focus: compliance scope and interface assumptions</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Pilot And Go-Live</span>
+    <h2>Training, Support, And Launch Model</h2>
+    <p class="lead">
+      A usable pilot depends as much on change management as on software. This page defines the minimum operating model for training, support, and the first live rollout.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Pilot footprint</span>
+        <div class="value">One unit, one procedure module, named pilot users</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Training model</span>
+        <div class="value">Role-based walkthroughs plus supervised pilot sessions</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Support model</span>
+        <div class="value">Defined owner for triage, fixes, and field changes</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Pilot Readiness Checklist</strong>
+        <ul class="bullets">
+          <li>Pilot users and clinical sponsor named</li>
+          <li>Mandatory field list approved</li>
+          <li>Sign-off and reopen rules approved</li>
+          <li>Test devices ready for desktop, tablet, and mobile review</li>
+          <li>Support contact path agreed for pilot issues</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Training And Adoption Approach</strong>
+        <ul class="bullets">
+          <li>Separate training for endoscopists, nurses, and administrators</li>
+          <li>Use realistic sample procedures during training</li>
+          <li>Run at least one supervised pilot shift before broader go-live</li>
+          <li>Collect structured feedback on completion time, missing steps, and unclear labels</li>
+          <li>Update defaults and field layout before expanding to additional users</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="approval-box">
+      <h3>Support Expectations During Pilot</h3>
+      <ul class="approval-list">
+        <li>Daily review of pilot issues during the first live period</li>
+        <li>Fast correction path for blocking workflow defects</li>
+        <li>Controlled process for changing field definitions and template wording</li>
+        <li>Clear communication of what changed and when it changed</li>
+      </ul>
+    </div>
+
+    <div class="meta">
+      <span>Section 12 of 23</span>
+      <span>Approval focus: pilot execution, training, and support readiness</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Acceptance</span>
+    <h2>MVP Acceptance Criteria And Go-Live Gates</h2>
+    <p class="lead">
+      This page defines what “good enough to launch” means for the first release. It gives stakeholders a concrete basis for judging whether the MVP can move from build into pilot or production.
+    </p>
+
+    <div class="two-col">
+      <div class="callout">
+        <strong>MVP Functional Acceptance Criteria</strong>
+        <ul class="bullets">
+          <li>Users can create, save, resume, and finalize a colonoscopy case</li>
+          <li>Mandatory shared safety fields are structured and visible</li>
+          <li>Polyp or lesion logs support repeatable structured entries</li>
+          <li>Specimen entries can create follow-up obligations</li>
+          <li>The system generates a readable final procedure note and PDF</li>
+          <li>Finalized records are locked and auditable</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>MVP Usability Acceptance Criteria</strong>
+        <ul class="bullets">
+          <li>Pilot users can complete the workflow without external workaround documents</li>
+          <li>Critical actions are understandable on first use after training</li>
+          <li>Save state and finalization state are always visible</li>
+          <li>Validation does not overwhelm users with end-of-form error dumps</li>
+          <li>Mobile allows meaningful review and follow-up actions even if desktop remains the primary authoring surface</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 18px;">
+      <div class="callout">
+        <strong>Go-Live Gate Criteria</strong>
+        <ul class="bullets">
+          <li>Clinical sponsor approves pilot workflow</li>
+          <li>Required security and compliance review is complete</li>
+          <li>Support and escalation path is active</li>
+          <li>Backup and recovery process is tested</li>
+          <li>Pilot users sign off that the core reporting workflow is usable</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Success Review After Pilot</strong>
+        <ul class="bullets">
+          <li>Measure completion time, missing fields, and same-day finalization</li>
+          <li>Count open and overdue follow-up tasks</li>
+          <li>Review whether generated notes are clinically acceptable without excessive editing</li>
+          <li>Use pilot findings to decide whether to expand to EGD next</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 13 of 23</span>
+      <span>Approval focus: objective launch gates and MVP definition</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Open Decisions</span>
+    <h2>Questions Stakeholders Must Answer</h2>
+    <p class="lead">
+      The following questions should be resolved as part of approval or immediately after it. They represent the main areas where uncertainty would otherwise create rework during design or implementation.
+    </p>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>Clinical And Workflow Questions</h3>
+        <ul class="field-list">
+          <li>Which local identifiers are mandatory in the final report?</li>
+          <li>Which procedure type should be piloted first if priorities change?</li>
+          <li>Which findings or scores are locally mandatory versus optional?</li>
+          <li>Who is allowed to finalize and who is allowed to reopen a record?</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Ownership Questions</h3>
+        <ul class="field-list">
+          <li>Who owns template governance after launch?</li>
+          <li>Who closes pathology and communication tasks?</li>
+          <li>Who triages user issues and requests field changes?</li>
+          <li>Who signs off on future procedure module expansion?</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Technical Questions</h3>
+        <ul class="field-list">
+          <li>Will the app integrate with a hospital system in phase one or later?</li>
+          <li>Will printing be local, network-based, or PDF-only initially?</li>
+          <li>Is mobile use inside the unit approved on institution-managed devices?</li>
+          <li>Is offline behavior required in any clinical setting?</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Approval Recommendation</h3>
+        <ul class="field-list">
+          <li>Approve the overall direction now</li>
+          <li>Record unresolved items in the PRD as named decision points</li>
+          <li>Do not block design-level approval on questions that can be resolved during phase zero</li>
+          <li>Do block production go-live on unresolved compliance or sign-off rules</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 14 of 23</span>
+      <span>Approval focus: unresolved items and decision management</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Market References</span>
+    <h2>Related Apps And Product Benchmarks</h2>
+    <p class="lead">
+      This proposal is not being made in a vacuum. The products below were referenced from current official sources as examples of the broader endoscopy reporting landscape. They are included as benchmark references, not endorsements.
+    </p>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>Provation</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: structured endoscopy reporting and GIQuIC-oriented quality capture</li>
+          <li>Notable benchmark idea: quality-indicator reporting should be native, not an afterthought</li>
+          <li>Official reference: <a href="https://www.provationmedical.com/endoscopy-software/">provationmedical.com/endoscopy-software</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>EndoVault</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: complete EHR, image management, and procedure documentation in a single database workflow</li>
+          <li>Notable benchmark idea: one shared data layer can reduce double documentation</li>
+          <li>Official reference: <a href="https://www.endosoft.com/endovault-ehr/">endosoft.com/endovault-ehr</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>gGastro ERW</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: fast documentation, quality measure data, and cloud deployment option</li>
+          <li>Notable benchmark idea: unify office, ASC, and hospital reporting where practical</li>
+          <li>Official reference: <a href="https://www.modmed.com/specialties/gastroenterology/endoscopy-report-writer/">modmed.com/.../endoscopy-report-writer</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Epic Lumens</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: scheduling, performing, resulting, following up, linking findings to images, and evaluating quality metrics within the EHR ecosystem</li>
+          <li>Notable benchmark idea: endoscopy reporting often benefits from close longitudinal-record integration</li>
+          <li>Official reference: <a href="https://www.epic.com/software/specialties/">epic.com/software/specialties</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>NewCura EndoManager</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: GIQuIC-certified reporting, e-signed reports, EMR or PACS interfacing, and quality metrics</li>
+          <li>Notable benchmark idea: the reporting layer should support integration and replacement of legacy endoscopy tools</li>
+          <li>Official reference: <a href="https://newcura.com/endomanager-report-writer/">newcura.com/endomanager-report-writer</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>enki Endoscopy Report Writer</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: GIQuIC reporting, recall workflows, pathology label printing, EHR interfacing, and cloud access</li>
+          <li>Notable benchmark idea: recall and follow-up workflows should be built into reporting, not left outside it</li>
+          <li>Official reference: <a href="https://nextservices.com/products/enki-endoscopy-report-writer-find-out-more/">nextservices.com/.../enki-endoscopy-report-writer</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Olympus Software And Documentation Ecosystem</h3>
+        <ul class="field-list">
+          <li>Reference emphasis: documentation automation, HIS or EMR archiving, reprocessing traceability, and enterprise integration</li>
+          <li>Notable benchmark idea: documentation should not be separated from image and device workflow where integration matters</li>
+          <li>Official references: <a href="https://medical.olympusamerica.com/technology/software-system-integration">Olympus software integration</a> and <a href="https://www.olympus.com.au/medical/en/Products-and-Solutions/Medical-Solutions/Digital-Healthcare/ENDOBASE.html">Olympus ENDOBASE</a></li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>How These Benchmarks Affect This Proposal</h3>
+        <ul class="field-list">
+          <li>Structured data and quality reporting are now baseline expectations</li>
+          <li>Image linkage and report generation should be first-class functions</li>
+          <li>Task and recall workflows add significant operational value</li>
+          <li>Legacy replacement and integration are realistic future requirements</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 15 of 23</span>
+      <span>Approval focus: external product landscape and benchmark rationale</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Standards And Ecosystem</span>
+    <h2>Quality Registry And Reporting Standards References</h2>
+    <p class="lead">
+      These external references help justify the product direction. They support the move toward structured electronic reporting, quality benchmarking, and integration with broader clinical records.
+    </p>
+
+    <div class="two-col">
+      <div class="callout">
+        <strong>Registry And Guidelines References</strong>
+        <ul class="ref-list">
+          <li><a href="https://giquic.org/about/what-is-giquic/">GIQuIC</a>: specialty registry focused on collecting, organizing, and displaying digestive healthcare data for benchmarking and quality improvement.</li>
+          <li><a href="https://www.asge.org/home/resources/publications/guidelines">ASGE Guidelines</a>: current guideline entry point for endoscopic quality indicators and related recommendations.</li>
+          <li><a href="https://www.giejournal.org/article/S0016-5107%2824%2903183-3/fulltext">Common GI endoscopy quality indicators (2024)</a>: supports cross-procedure common safety and quality fields.</li>
+          <li><a href="https://www.giejournal.org/article/S0016-5107%2824%2903164-X/fulltext">Colonoscopy quality indicators (2024)</a>: supports the colonoscopy-first MVP decision.</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <strong>Reporting-System Standards References</strong>
+        <ul class="ref-list">
+          <li><a href="https://www.esge.com/requirements-standards-facilitating-quality-improvement-for-reporting-systems-in-gastrointestinal-endo">ESGE reporting-system requirements</a>: electronic reporting, patient-record integration, structured entry, and reduced free text.</li>
+          <li><a href="https://www.epic.com/software/specialties/">Epic Lumens reference</a>: shows how some institutions handle endoscopy reporting within a larger EHR ecosystem.</li>
+          <li><a href="https://medical.olympusamerica.com/technology/software-system-integration">Olympus software integration reference</a>: shows enterprise emphasis on documentation, archive, and device-linked data flow.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="approval-box">
+      <h3>What These References Support In This Proposal</h3>
+      <ul class="approval-list">
+        <li>Electronic reporting should be structured, not primarily narrative free text</li>
+        <li>Quality capture should happen during documentation, not in a separate system later</li>
+        <li>Integration with the broader patient record is desirable even if phased later</li>
+        <li>Benchmarking and follow-up are core value drivers, not optional extras</li>
+      </ul>
+    </div>
+
+    <div class="meta">
+      <span>Section 16 of 23</span>
+      <span>Approval focus: standards-based justification for the product direction</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Release Plan</span>
+    <h2>Phased Delivery And Governance</h2>
+    <p class="lead">
+      The fastest path to a usable and approvable product is to build the shared workflow engine first, then release one procedure module before expanding to additional complex modules.
+    </p>
+
+    <div class="roadmap">
+      <div class="roadmap-row">
+        <div class="roadmap-phase">Phase 0</div>
+        <div class="roadmap-card">
+          <strong>Discovery and field definition</strong>
+          <ul class="bullets">
+            <li>Confirm mandatory fields, sign-off rules, and local workflow</li>
+            <li>Approve product boundary and role model</li>
+            <li>Approve the UI and UX direction in this pack</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="roadmap-row">
+        <div class="roadmap-phase">Phase 1</div>
+        <div class="roadmap-card">
+          <strong>Foundation build</strong>
+          <ul class="bullets">
+            <li>Universal app shell for web, Android, and iPhone</li>
+            <li>Authentication, roles, audit trail, and data model</li>
+            <li>Shared design system and form engine</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="roadmap-row">
+        <div class="roadmap-phase">Phase 2</div>
+        <div class="roadmap-card">
+          <strong>Colonoscopy MVP</strong>
+          <ul class="bullets">
+            <li>Case setup, safety flow, findings, specimens, impression, sign-off</li>
+            <li>Generated report and PDF output</li>
+            <li>Follow-up queue for specimen and pathology closure</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="roadmap-row">
+        <div class="roadmap-phase">Phase 3</div>
+        <div class="roadmap-card">
+          <strong>Pilot hardening and expansion</strong>
+          <ul class="bullets">
+            <li>Real-user usability testing and iteration</li>
+            <li>EGD addition after the shared workflow is stable</li>
+            <li>ERCP and EUS planned after core success is proven</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="approval-box">
+      <h3>Decision Summary For Stakeholders</h3>
+      <div class="approval-grid">
+        <div>
+          <div class="section-title">Approve</div>
+          <ul class="approval-list">
+            <li>Universal product direction: one app for web and mobile</li>
+            <li>Primary desktop and tablet authoring model</li>
+            <li>Mobile follow-up, review, and quick-action model</li>
+            <li>Colonoscopy-first delivery strategy</li>
+          </ul>
+        </div>
+        <div>
+          <div class="section-title">Confirm Before Build</div>
+          <ul class="approval-list">
+            <li>Mandatory local identifiers and legal sign-off rules</li>
+            <li>Whether patient data is created locally or imported</li>
+            <li>Specimen and pathology follow-up ownership</li>
+            <li>Preferred pilot site or first clinical team</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Section 17 of 23</span>
+      <span>Approval focus: rollout sequence and decision gates</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Field Reference Appendix</span>
+    <h2>Shared Core Fields Across All Procedure Types</h2>
+    <p class="lead">
+      The following shared fields appear across EGD, colonoscopy, ERCP, and EUS in the source reference forms. They should be visible in the product model and available for structured capture in every procedure workflow.
+    </p>
+
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="label">Applies to</span>
+        <div class="value">EGD, colonoscopy, ERCP, and EUS</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Purpose</span>
+        <div class="value">Common safety, identity, staffing, and sign-off context</div>
+      </div>
+      <div class="mini-card">
+        <span class="label">Reference basis</span>
+        <div class="value">Shared fields from the source endoscopy procedure forms</div>
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>Patient And Encounter Header</h3>
+        <ul class="field-list">
+          <li>Patient name or ID</li>
+          <li>Date and time</li>
+          <li>Date of birth or age</li>
+          <li>Sex</li>
+          <li>Facility or unit</li>
+          <li>Endoscopist</li>
+          <li>Referrer or service</li>
+          <li>Assistant or nurse</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Indication And Risk Context</h3>
+        <ul class="field-list">
+          <li>Indication</li>
+          <li>Priority: elective, urgent, or emergency</li>
+          <li>Relevant history</li>
+          <li>ASA class: I, II, III, IV, or V</li>
+          <li>Allergies</li>
+          <li>Antithrombotic plan: not applicable, continue, hold, or bridging other</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Safety, Consent, And Monitoring</h3>
+        <ul class="field-list">
+          <li>Consent documented</li>
+          <li>Team pause completed</li>
+          <li>Sedation or anesthesia</li>
+          <li>Monitoring: SpO2, heart rate, blood pressure, ECG, capnography</li>
+          <li>Antibiotics: not applicable or indicated and given</li>
+          <li>Pregnancy status: not applicable, negative, or positive known</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>How These Shared Fields Should Appear</h3>
+        <ul class="field-list">
+          <li>Always shown near the top of the workflow with clear completion state</li>
+          <li>Available before procedure-specific modules begin</li>
+          <li>Reusable in report output and audit review</li>
+          <li>Structured so missing safety items can block final sign-off when required</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="reference-note" style="margin-top: 14px;">
+      Visual reference intent: this shared section should read as a compact intake and safety header that remains consistent across all procedure types before the workflow branches into procedure-specific sections.
+    </p>
+
+    <div class="meta">
+      <span>Section 18 of 23</span>
+      <span>Approval focus: common field inventory across all workflows</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Field Reference Appendix</span>
+    <h2>EGD Field Reference</h2>
+    <p class="lead">
+      This page groups the EGD-specific fields extracted from the reference form. Shared core fields from the previous page also apply to every EGD case.
+    </p>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>Procedure Details And Completeness</h3>
+        <ul class="field-list">
+          <li>Instrument or scope ID</li>
+          <li>Extent reached: esophagus, stomach, D1, D2, or other</li>
+          <li>Start time and end time</li>
+          <li>Preparation or fasting: adequate or inadequate</li>
+          <li>Procedure tolerance: good, fair, or poor</li>
+          <li>Photodocumentation: landmarks and pathology</li>
+          <li>Specimens: none or obtained</li>
+          <li>Technical limitation and adverse event</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Systematic Examination And Photos</h3>
+        <ul class="field-list">
+          <li>Area rows for esophagus, Z-line or GE junction, cardia or fundus in retroflexion, gastric body, incisura or antrum, pylorus, duodenal bulb, and second duodenum</li>
+          <li>Each row captures normal, abnormal description, and photo status</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Standardized Findings And Lesion Log</h3>
+        <ul class="field-list">
+          <li>Erosive esophagitis LA grade: A to D</li>
+          <li>Barrett extent using Prague criteria: C and M lengths plus visible lesion</li>
+          <li>Eosinophilic esophagitis EREFS components</li>
+          <li>Peptic ulcer bleeding Forrest classification</li>
+          <li>Gastric premalignant or other standardized score</li>
+          <li>Repeatable lesion or finding log: site, finding or morphology, size or extent, bleeding or stigmata, photo number</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Specimens, Therapy, Impression, And Plan</h3>
+        <ul class="field-list">
+          <li>Biopsy or specimen log: container, site, number, test or question, label verified</li>
+          <li>Therapy fields: hemostasis method, dilation type and diameter, variceal or other therapy, treatment outcome</li>
+          <li>Impression</li>
+          <li>H. pylori status or plan</li>
+          <li>Medication or therapy plan</li>
+          <li>Follow-up or surveillance</li>
+          <li>Pathology and communication tracking requirement</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="reference-note" style="margin-top: 14px;">
+      Visual reference intent: EGD should feel like a guided anatomical exam with standardized scoring where applicable, followed by a structured lesion and specimen workflow before the final plan is generated.
+    </p>
+
+    <div class="meta">
+      <span>Section 19 of 23</span>
+      <span>Approval focus: EGD field completeness and layout grouping</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Field Reference Appendix</span>
+    <h2>Colonoscopy Field Reference</h2>
+    <p class="lead">
+      Colonoscopy is the proposed first live module. This appendix page shows the full field set that should be represented in the MVP workflow, with repeatable lesion and follow-up structures visible to stakeholders.
+    </p>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>Preparation, Insertion, And Completeness</h3>
+        <ul class="field-list">
+          <li>Bowel preparation agent</li>
+          <li>Preparation quality: adequate or inadequate</li>
+          <li>BBPS by right, transverse, and left colon plus total score</li>
+          <li>Insertion time</li>
+          <li>Cecum reached: yes or no</li>
+          <li>Cecal landmarks: appendiceal orifice and ileocecal valve</li>
+          <li>Photo documentation for cecum and pathology</li>
+          <li>Terminal ileum status and withdrawal time</li>
+          <li>Technical limitation and adverse event</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Segmental Examination And IBD Activity</h3>
+        <ul class="field-list">
+          <li>Segment rows for terminal ileum, cecum, ascending colon, transverse colon, descending colon, sigmoid colon, and rectum or retroflexion</li>
+          <li>Each row captures normal, finding or inflammation or lesion, and photo status</li>
+          <li>Ulcerative colitis Mayo Endoscopic Score</li>
+          <li>Crohn disease SES-CD or other validated score</li>
+          <li>Disease extent</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Polyp And Resection Recording</h3>
+        <ul class="field-list">
+          <li>Repeatable polyp or lesion log rows with number, location, size in mm, morphology, resection method, complete resection, retrieved status, and container</li>
+          <li>Small polyp technique: cold snare, hot snare, forceps, or other</li>
+          <li>Advanced resection: EMR, ESD, piecemeal, en bloc, or not applicable</li>
+          <li>Tattoo placement with location or relationship</li>
+          <li>Hemostasis or defect closure method</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Impression And Follow-Up</h3>
+        <ul class="field-list">
+          <li>Impression</li>
+          <li>Pathology: none or pending tracking required</li>
+          <li>Screening or surveillance interval with pending pathology option</li>
+          <li>Reason for interval: guideline-based, prep quality, piecemeal resection, or other</li>
+          <li>Adverse event plan: routine discharge, observe or admit, or other</li>
+          <li>Communication: patient informed, referrer informed, written instructions given</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="reference-note" style="margin-top: 14px;">
+      Visual reference intent: colonoscopy should show clear separation between preparation and completeness, segmental inspection, repeatable polyp logging, and post-procedure follow-up decisions.
+    </p>
+
+    <div class="meta">
+      <span>Section 20 of 23</span>
+      <span>Approval focus: colonoscopy MVP field visibility and completeness</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Field Reference Appendix</span>
+    <h2>ERCP Field Reference</h2>
+    <p class="lead">
+      ERCP adds preprocedure risk mitigation, device management, fluoroscopy, and 30-day follow-up requirements. These fields should be visible to stakeholders now even though ERCP is planned after the initial MVP.
+    </p>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>ERCP-Specific Preprocedure Checks</h3>
+        <ul class="field-list">
+          <li>Papilla status and therapeutic intent</li>
+          <li>Imaging reviewed: ultrasound, CT, MRCP, EUS, prior ERCP</li>
+          <li>Antibiotic prophylaxis</li>
+          <li>Rectal NSAID choice or contraindication</li>
+          <li>Hydration plan</li>
+          <li>Pancreatic stent plan and rescue plan</li>
+          <li>Radiation protection verified</li>
+          <li>Pregnancy precautions addressed</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Cannulation And Cholangiopancreatography</h3>
+        <ul class="field-list">
+          <li>Bile duct cannulation success and technique</li>
+          <li>Cannulation difficulty: contacts and time</li>
+          <li>Unintended pancreatic duct access count</li>
+          <li>Pancreatic duct access details and prophylactic pancreatic duct stent</li>
+          <li>Cholangiogram details including CBD size, intrahepatic ducts, stones, strictures, leak, anatomy, and drainage achieved</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Therapy And Radiation</h3>
+        <ul class="field-list">
+          <li>Sphincterotomy type and details</li>
+          <li>Papillary dilation with balloon size</li>
+          <li>Stone therapy method</li>
+          <li>Stricture therapy including dilation, brush cytology, biopsy, or other</li>
+          <li>Biliary stent details including plastic or SEMS size and location</li>
+          <li>Other intervention</li>
+          <li>Fluoroscopy time, dose-area product, reference air kerma, images acquired, and dose-reduction measures</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Outcome, Device Follow-Up, And 30-Day Review</h3>
+        <ul class="field-list">
+          <li>Intended therapy and technical success</li>
+          <li>Stone clearance and biliary drainage status</li>
+          <li>Immediate adverse event</li>
+          <li>Temporary stent and removal or exchange due date</li>
+          <li>Pancreatic duct stent and migration or passage check</li>
+          <li>Patient contact, tracking register, repeat intervention, and timing</li>
+          <li>30-day quality follow-up rows for post-ERCP pancreatitis, clinically significant bleeding, cholangitis or cholecystitis, and unplanned hospital visit or biliary intervention</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="reference-note" style="margin-top: 14px;">
+      Visual reference intent: ERCP should feel procedure-safety heavy, with explicit preventive steps, device detail, fluoroscopy capture, and longitudinal follow-up after the immediate report is complete.
+    </p>
+
+    <div class="meta">
+      <span>Section 21 of 23</span>
+      <span>Approval focus: ERCP complexity and future workflow visibility</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Field Reference Appendix</span>
+    <h2>EUS Field Reference</h2>
+    <p class="lead">
+      EUS combines anatomical examination, lesion characterization, staging, tissue acquisition, and interventional options. These groups should be visible in the future-state design even if the first release begins with a simpler procedure type.
+    </p>
+
+    <div class="field-grid">
+      <div class="field-panel">
+        <h3>Procedure Type And Anatomic Examination</h3>
+        <ul class="field-list">
+          <li>Echoendoscope type: radial, linear, or miniprobe</li>
+          <li>EUS intent: diagnostic, tissue acquisition, or therapeutic</li>
+          <li>Upper GI anatomy reviewed</li>
+          <li>Pancreaticobiliary anatomy reviewed</li>
+          <li>Other anatomy including liver, adrenal, mediastinum, and nodes</li>
+          <li>Doppler used</li>
+          <li>Relevant anatomy documented and photos or images</li>
+          <li>Technical limitation and immediate adverse event</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Lesion Characterization And Staging</h3>
+        <ul class="field-list">
+          <li>Repeatable lesion or mass or node rows with site, size in mm, echogenicity, margins, vascular relation, nodes, and image number</li>
+          <li>Cancer site</li>
+          <li>Staging system: TNM or other</li>
+          <li>T stage, N stage, M features, vascular invasion, overall EUS stage, and management implication</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Tissue Acquisition</h3>
+        <ul class="field-list">
+          <li>Target and approach: transgastric, transduodenal, transesophageal, or other</li>
+          <li>Needle type: FNA or FNB</li>
+          <li>Gauge: 19G, 20G, 22G, 25G, or other</li>
+          <li>Needle design and number of passes</li>
+          <li>ROSE availability and adequacy</li>
+          <li>Macroscopic on-site evaluation</li>
+          <li>Specimen type and container</li>
+          <li>Adequacy at procedure, label verification, complication, and antibiotics</li>
+        </ul>
+      </div>
+      <div class="field-panel">
+        <h3>Interventional EUS And Follow-Up</h3>
+        <ul class="field-list">
+          <li>Interventional procedure type including PFC drainage, biliary drainage, gallbladder drainage, gastroenterostomy, EDGE, or other</li>
+          <li>Target or route and device or stent</li>
+          <li>Technical success</li>
+          <li>Clinical plan and immediate adverse event</li>
+          <li>Impression</li>
+          <li>Pathology or cytology tracking</li>
+          <li>Follow-up imaging or procedure</li>
+          <li>Multidisciplinary referral and communication status</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="reference-note" style="margin-top: 14px;">
+      Visual reference intent: EUS should be grouped around diagnostic anatomy, lesion detail, acquisition workflow, and interventional follow-up so that the complexity remains understandable and navigable.
+    </p>
+
+    <div class="meta">
+      <span>Section 22 of 23</span>
+      <span>Approval focus: EUS field coverage and future-state module scope</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="eyebrow">Approval Page</span>
+    <h2>Stakeholder Sign-Off</h2>
+    <p class="lead">
+      This page is intended for formal approval of the proposed product direction, user experience, and first-release scope. It can be completed digitally or printed for physical sign-off.
+    </p>
+
+    <div class="approval-box">
+      <h3>Approval Statement</h3>
+      <p style="margin: 0; line-height: 1.6; color: var(--ink-soft);">
+        We approve the proposed direction for the Endoscopy Reporting App as described in this document, including the shared web and mobile product approach, the user experience principles, the screen layout direction, and the phased delivery plan beginning with the colonoscopy MVP.
+      </p>
+
+      <div class="approval-grid">
+        <div>
+          <div class="sign-line">Name / Role</div>
+          <div class="sign-line">Signature</div>
+          <div class="sign-line">Date</div>
+        </div>
+        <div>
+          <div class="sign-line">Name / Role</div>
+          <div class="sign-line">Signature</div>
+          <div class="sign-line">Date</div>
+        </div>
+      </div>
+
+      <div class="approval-grid">
+        <div>
+          <div class="sign-line">Name / Role</div>
+          <div class="sign-line">Signature</div>
+          <div class="sign-line">Date</div>
+        </div>
+        <div>
+          <div class="sign-line">Name / Role</div>
+          <div class="sign-line">Signature</div>
+          <div class="sign-line">Date</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      Note: The screen mockups in this pack are approval-level concept layouts intended to validate direction, not final pixel-perfect UI specifications. Detailed wireframes and build-ready screen definitions should follow approval.
+    </p>
+
+    <div class="meta">
+      <span>Section 23 of 23</span>
+      <span>Approval focus: formal sign-off</span>
+    </div>
+  </section>
+</body>
+</html>

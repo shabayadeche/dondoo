@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_phd_ass_patient_endoscopist,access.phd.ass.patient.endoscopist,model_phd_ass_patient,phd_ass_bridge.group_phd_ass_endoscopist,1,1,1,0
+access_phd_ass_patient_nurse,access.phd.ass.patient.nurse,model_phd_ass_patient,phd_ass_bridge.group_phd_ass_nurse,1,1,1,0
+access_phd_ass_patient_operations_admin,access.phd.ass.patient.operations.admin,model_phd_ass_patient,phd_ass_bridge.group_phd_ass_operations_admin,1,1,1,1
+access_phd_ass_patient_admin,access.phd.ass.patient.admin,model_phd_ass_patient,phd_ass_bridge.group_phd_ass_admin,1,1,1,1
+access_phd_ass_patient_relationship_endoscopist,access.phd.ass.patient.relationship.endoscopist,model_phd_ass_patient_care_relationship,phd_ass_bridge.group_phd_ass_endoscopist,1,0,0,0
+access_phd_ass_patient_relationship_nurse,access.phd.ass.patient.relationship.nurse,model_phd_ass_patient_care_relationship,phd_ass_bridge.group_phd_ass_nurse,1,0,0,0
+access_phd_ass_patient_relationship_operations_admin,access.phd.ass.patient.relationship.operations.admin,model_phd_ass_patient_care_relationship,phd_ass_bridge.group_phd_ass_operations_admin,1,1,1,1
+access_phd_ass_patient_relationship_admin,access.phd.ass.patient.relationship.admin,model_phd_ass_patient_care_relationship,phd_ass_bridge.group_phd_ass_admin,1,1,1,1

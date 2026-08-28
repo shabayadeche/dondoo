@@ -1,0 +1,29 @@
+{
+  "name": "@phd-ass/app",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "15.1.1",
+    "@phd-ass/config": "file:../../packages/config",
+    "@phd-ass/domain": "file:../../packages/domain",
+    "@phd-ass/ui": "file:../../packages/ui",
+    "expo": "57.0.14",
+    "expo-router": "57.0.14",
+    "expo-status-bar": "57.0.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-native": "0.87.0",
+    "react-native-web": "0.21.2"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18"
+  }
+}

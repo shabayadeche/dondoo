@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_phd_ass_specimen_pathology_list" model="ir.ui.view">
+    <field name="name">phd.ass.case.specimen.pathology.list</field>
+    <field name="model">phd.ass.case.specimen</field>
+    <field name="arch" type="xml">
+      <list string="Specimen Tracking">
+        <field name="case_id"/>
+        <field name="container_label"/>
+        <field name="specimen_site"/>
+        <field name="pathology_tracking_state"/>
+        <field name="lab_accession_number"/>
+        <field name="sent_to_lab_at"/>
+        <field name="result_received_at"/>
+        <field name="reviewed_at"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_specimen_pathology_search" model="ir.ui.view">
+    <field name="name">phd.ass.case.specimen.pathology.search</field>
+    <field name="model">phd.ass.case.specimen</field>
+    <field name="arch" type="xml">
+      <search string="Specimen Tracking">
+        <field name="case_id"/>
+        <field name="container_label"/>
+        <field name="specimen_site"/>
+        <field name="lab_accession_number"/>
+        <filter name="filter_collected" string="Collected" domain="[('pathology_tracking_state', '=', 'collected')]"/>
+        <filter name="filter_pending" string="Pending Result" domain="[('pathology_tracking_state', 'in', ('sent_to_lab', 'result_pending'))]"/>
+        <filter name="filter_received" string="Result Received" domain="[('pathology_tracking_state', '=', 'result_received')]"/>
+        <filter name="filter_reviewed" string="Reviewed" domain="[('pathology_tracking_state', '=', 'reviewed')]"/>
+        <separator/>
+        <filter name="group_case" string="Group By Case" context="{'group_by': 'case_id'}"/>
+        <filter name="group_state" string="Group By Tracking State" context="{'group_by': 'pathology_tracking_state'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_specimen_pathology_form" model="ir.ui.view">
+    <field name="name">phd.ass.case.specimen.pathology.form</field>
+    <field name="model">phd.ass.case.specimen</field>
+    <field name="arch" type="xml">
+      <form string="Specimen Tracking">
+        <header>
+          <button name="action_mark_sent_to_lab" type="object" string="Mark Sent To Lab"/>
+          <button name="action_mark_result_pending" type="object" string="Mark Pending Result"/>
+          <button name="action_mark_result_received" type="object" string="Mark Result Received"/>
+          <button name="action_mark_reviewed" type="object" string="Mark Reviewed"/>
+          <button name="action_mark_pathology_closed" type="object" string="Close Tracking"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="case_id"/>
+              <field name="container_label"/>
+              <field name="specimen_site"/>
+              <field name="specimen_count"/>
+            </group>
+            <group>
+              <field name="pathology_tracking_state"/>
+              <field name="lab_accession_number"/>
+              <field name="sent_to_lab_at"/>
+              <field name="result_received_at"/>
+            </group>
+          </group>
+          <group>
+            <group>
+              <field name="label_verified"/>
+              <field name="reviewed_at" readonly="1"/>
+              <field name="reviewed_by_user_id" readonly="1"/>
+            </group>
+            <group>
+              <field name="test_question"/>
+              <field name="pathology_note"/>
+            </group>
+          </group>
+          <group>
+            <field name="result_summary"/>
+            <field name="result_attachment_id"/>
+          </group>
+          <notebook>
+            <page string="Linked Tasks">
+              <field name="linked_task_ids" nolabel="1" readonly="1">
+                <list create="false" edit="false" delete="false">
+                  <field name="name"/>
+                  <field name="task_type"/>
+                  <field name="task_owner_user_id"/>
+                  <field name="task_status"/>
+                  <field name="due_date"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_followup_task_list_pathology" model="ir.ui.view">
+    <field name="name">phd.ass.followup.task.list.pathology</field>
+    <field name="model">phd.ass.followup.task</field>
+    <field name="inherit_id" ref="phd_ass_bridge.view_phd_ass_followup_task_list"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='task_type']" position="after">
+        <field name="specimen_id"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_followup_task_form_pathology" model="ir.ui.view">
+    <field name="name">phd.ass.followup.task.form.pathology</field>
+    <field name="model">phd.ass.followup.task</field>
+    <field name="inherit_id" ref="phd_ass_bridge.view_phd_ass_followup_task_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='task_type']" position="after">
+        <field name="specimen_id" domain="[('case_id', '=', case_id)]"/>
+      </xpath>
+      <xpath expr="//field[@name='resolution_note']" position="before">
+        <field name="pathology_note"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_form_pathology" model="ir.ui.view">
+    <field name="name">phd.ass.case.form.pathology</field>
+    <field name="model">phd.ass.case</field>
+    <field name="inherit_id" ref="phd_ass_bridge.view_phd_ass_case_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='requires_followup']" position="after">
+        <field name="open_pathology_specimen_count" readonly="1"/>
+      </xpath>
+      <xpath expr="//field[@name='specimen_ids']/list/field[@name='label_verified']" position="after">
+        <field name="pathology_tracking_state"/>
+        <field name="lab_accession_number"/>
+        <field name="result_received_at"/>
+      </xpath>
+      <xpath expr="//field[@name='task_ids']/list/field[@name='task_type']" position="after">
+        <field name="specimen_id" domain="[('case_id', '=', parent.id)]"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_phd_ass_pathology_specimens" model="ir.actions.act_window">
+    <field name="name">Specimen Tracking</field>
+    <field name="res_model">phd.ass.case.specimen</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="view_phd_ass_specimen_pathology_search"/>
+  </record>
+
+  <record id="action_phd_ass_pathology_tasks" model="ir.actions.act_window">
+    <field name="name">Pathology Tasks</field>
+    <field name="res_model">phd.ass.followup.task</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('task_type', 'in', ('pathology_review', 'specimen_resolution'))]</field>
+  </record>
+
+  <menuitem id="menu_phd_ass_pathology_root" name="Pathology" parent="phd_ass_bridge.menu_phd_ass_root" sequence="25" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_pathology_specimens" name="Specimen Tracking" parent="menu_phd_ass_pathology_root" action="action_phd_ass_pathology_specimens" sequence="10" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_pathology_tasks" name="Pathology Tasks" parent="menu_phd_ass_pathology_root" action="action_phd_ass_pathology_tasks" sequence="20" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+</odoo>

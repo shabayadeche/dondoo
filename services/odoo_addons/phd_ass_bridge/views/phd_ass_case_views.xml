@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_phd_ass_case_list" model="ir.ui.view">
+    <field name="name">phd.ass.case.list</field>
+    <field name="model">phd.ass.case</field>
+    <field name="arch" type="xml">
+      <list string="Clinical Cases">
+        <field name="name" readonly="1"/>
+        <field name="patient_identifier"/>
+        <field name="procedure_type"/>
+        <field name="procedure_datetime"/>
+        <field name="case_status"/>
+        <field name="followup_state" readonly="1"/>
+        <field name="sync_status" readonly="1"/>
+        <field name="last_push_to_api_at" readonly="1"/>
+        <field name="finalized_at" readonly="1"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_form" model="ir.ui.view">
+    <field name="name">phd.ass.case.form</field>
+    <field name="model">phd.ass.case</field>
+    <field name="arch" type="xml">
+      <form string="Clinical Case">
+        <header>
+          <button name="action_push_to_clinical_api" type="object" string="Push To Clinical API" class="oe_highlight" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_admin"/>
+          <button name="action_generate_report_preview" type="object" string="Generate Report Preview" invisible="case_status == 'finalized'" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_admin"/>
+          <button name="action_mark_ready_for_signoff" type="object" string="Mark Ready For Sign-Off" invisible="case_status in ('ready_for_signoff', 'finalized')" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_admin"/>
+          <button name="action_finalize_report" type="object" string="Finalize Report" class="oe_highlight" invisible="case_status != 'ready_for_signoff'" groups="phd_ass_bridge.group_phd_ass_endoscopist"/>
+          <button name="action_return_to_draft" type="object" string="Return To Draft" invisible="case_status not in ('ready_for_signoff', 'draft_reopened')" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+          <button name="action_open_reopen_wizard" type="object" string="Reopen Finalized Case" invisible="case_status != 'finalized'" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+          <field name="case_status" widget="statusbar" statusbar_visible="draft,ready_for_signoff,draft_reopened,finalized"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="name" readonly="1"/>
+              <field name="external_case_id" readonly="1"/>
+              <field name="procedure_type"/>
+              <field name="patient_identifier"/>
+              <field name="procedure_datetime"/>
+              <field name="facility_id"/>
+              <field name="facility_unit_id" domain="[('facility_id', '=', facility_id)]"/>
+            </group>
+            <group>
+              <field name="sex"/>
+              <field name="endoscopist_user_id"/>
+              <field name="available_nurse_user_ids" invisible="1"/>
+              <field name="assistant_nurse_user_id" domain="[('id', 'in', available_nurse_user_ids)]"/>
+              <field name="followup_state" readonly="1"/>
+              <field name="sync_status" readonly="1"/>
+              <field name="last_push_to_api_at" readonly="1"/>
+              <field name="last_synced_at" readonly="1"/>
+              <field name="last_sync_error" readonly="1"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Case Header">
+              <group>
+                <group>
+                  <field name="dob_or_age"/>
+                  <field name="referrer_service"/>
+                  <field name="requires_followup" readonly="1"/>
+                  <field name="facility_unit" readonly="1"/>
+                </group>
+                <group>
+                  <field name="endoscopist_user_ref" readonly="1"/>
+                  <field name="assistant_nurse_user_ref" readonly="1"/>
+                  <field name="finalized_at" readonly="1"/>
+                  <field name="finalized_by_user_ref" readonly="1"/>
+                  <field name="pdf_attachment_id" readonly="1"/>
+                  <field name="pdf_asset_ref" readonly="1"/>
+                </group>
+              </group>
+            </page>
+            <page string="Safety">
+              <group>
+                <group>
+                  <field name="indication"/>
+                  <field name="priority"/>
+                  <field name="relevant_history"/>
+                  <field name="asa_class"/>
+                  <field name="allergies"/>
+                  <field name="antithrombotic_plan"/>
+                </group>
+                <group>
+                  <field name="consent_documented"/>
+                  <field name="team_pause_completed"/>
+                  <field name="sedation_anesthesia"/>
+                  <field name="monitor_spo2"/>
+                  <field name="monitor_hr"/>
+                  <field name="monitor_bp"/>
+                  <field name="monitor_ecg"/>
+                  <field name="monitor_capnography"/>
+                  <field name="antibiotics_status"/>
+                  <field name="pregnancy_status"/>
+                </group>
+              </group>
+            </page>
+            <page string="Colonoscopy Prep" invisible="procedure_type != 'colonoscopy'">
+              <group>
+                <group>
+                  <field name="bowel_prep_agent"/>
+                  <field name="prep_quality"/>
+                  <field name="bbps_right"/>
+                  <field name="bbps_transverse"/>
+                  <field name="bbps_left"/>
+                  <field name="bbps_total" readonly="1"/>
+                </group>
+                <group>
+                  <field name="insertion_time"/>
+                  <field name="cecum_reached"/>
+                  <field name="cecal_landmark_appendiceal_orifice"/>
+                  <field name="cecal_landmark_ileocecal_valve"/>
+                  <field name="photo_cecum"/>
+                  <field name="photo_pathology"/>
+                  <field name="terminal_ileum_status"/>
+                  <field name="withdrawal_time_minutes"/>
+                </group>
+              </group>
+              <group>
+                <field name="technical_limitation"/>
+                <field name="technical_limitation_note"/>
+                <field name="adverse_event_during_procedure"/>
+                <field name="adverse_event_note"/>
+              </group>
+            </page>
+            <page string="Colonoscopy Segment Exam" invisible="procedure_type != 'colonoscopy'">
+              <group>
+                <group>
+                  <field name="uc_mayo_score"/>
+                  <field name="crohn_score"/>
+                </group>
+                <group>
+                  <field name="disease_extent"/>
+                </group>
+              </group>
+              <field name="segment_ids" nolabel="1">
+                <list editable="bottom">
+                  <field name="sequence"/>
+                  <field name="segment_name"/>
+                  <field name="normal"/>
+                  <field name="photo_taken"/>
+                  <field name="finding_note"/>
+                </list>
+              </field>
+            </page>
+            <page string="Colonoscopy Lesion Log" invisible="procedure_type != 'colonoscopy'">
+              <field name="lesion_ids" nolabel="1">
+                <list editable="bottom">
+                  <field name="sequence"/>
+                  <field name="lesion_location"/>
+                  <field name="lesion_size_mm"/>
+                  <field name="lesion_morphology"/>
+                  <field name="resection_method"/>
+                  <field name="complete_resection"/>
+                  <field name="retrieved"/>
+                  <field name="specimen_container_ref"/>
+                </list>
+              </field>
+            </page>
+            <page string="Colonoscopy Plan" invisible="procedure_type != 'colonoscopy'">
+              <group>
+                <group>
+                  <field name="small_polyp_technique"/>
+                  <field name="small_polyp_technique_note"/>
+                  <field name="advanced_resection_type"/>
+                  <field name="tattoo_status"/>
+                  <field name="tattoo_location_note"/>
+                  <field name="hemostasis_or_closure"/>
+                </group>
+                <group>
+                  <field name="impression"/>
+                  <field name="pathology_status"/>
+                  <field name="surveillance_interval_value"/>
+                  <field name="surveillance_interval_pending_pathology"/>
+                  <field name="surveillance_interval_reason"/>
+                  <field name="surveillance_interval_reason_note"/>
+                  <field name="adverse_event_plan"/>
+                  <field name="adverse_event_plan_note"/>
+                  <field name="informed_patient"/>
+                  <field name="informed_referrer"/>
+                  <field name="written_instructions_given"/>
+                </group>
+              </group>
+            </page>
+            <page string="EGD Procedure" invisible="procedure_type != 'egd'">
+              <group>
+                <group>
+                  <field name="egd_scope_id" string="Instrument / Scope ID"/>
+                  <field name="egd_extent_reached" string="Extent Reached"/>
+                  <field name="egd_start_time" string="Start Time"/>
+                  <field name="egd_end_time" string="End Time"/>
+                  <field name="egd_preparation_status" string="Preparation / Fasting"/>
+                  <field name="egd_tolerance" string="Procedure Tolerance"/>
+                  <field name="egd_photo_landmarks" string="Photodocumentation Landmarks"/>
+                  <field name="photo_pathology" string="Photodocumentation Pathology"/>
+                </group>
+                <group>
+                  <field name="egd_specimens_obtained" string="Specimens Obtained"/>
+                  <field name="egd_hiatal_hernia"/>
+                  <field name="egd_retroflexion_performed"/>
+                  <field name="egd_biopsy_taken"/>
+                  <field name="technical_limitation"/>
+                  <field name="technical_limitation_note"/>
+                  <field name="adverse_event_during_procedure"/>
+                  <field name="adverse_event_note"/>
+                </group>
+              </group>
+            </page>
+            <page string="EGD Systematic Exam" invisible="procedure_type != 'egd'">
+              <group>
+                <group string="Esophagus">
+                  <field name="egd_exam_esophagus_normal" string="Normal"/>
+                  <field name="egd_exam_esophagus_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_esophagus_photo" string="Photo"/>
+                </group>
+                <group string="Z-Line / GE Junction">
+                  <field name="egd_exam_z_line_normal" string="Normal"/>
+                  <field name="egd_exam_z_line_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_z_line_photo" string="Photo"/>
+                </group>
+                <group string="Cardia / Fundus">
+                  <field name="egd_exam_cardia_fundus_normal" string="Normal"/>
+                  <field name="egd_exam_cardia_fundus_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_cardia_fundus_photo" string="Photo"/>
+                </group>
+                <group string="Gastric Body">
+                  <field name="egd_exam_gastric_body_normal" string="Normal"/>
+                  <field name="egd_exam_gastric_body_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_gastric_body_photo" string="Photo"/>
+                </group>
+                <group string="Incisura / Antrum">
+                  <field name="egd_exam_incisura_antrum_normal" string="Normal"/>
+                  <field name="egd_exam_incisura_antrum_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_incisura_antrum_photo" string="Photo"/>
+                </group>
+                <group string="Pylorus">
+                  <field name="egd_exam_pylorus_normal" string="Normal"/>
+                  <field name="egd_exam_pylorus_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_pylorus_photo" string="Photo"/>
+                </group>
+                <group string="Duodenal Bulb">
+                  <field name="egd_exam_duodenal_bulb_normal" string="Normal"/>
+                  <field name="egd_exam_duodenal_bulb_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_duodenal_bulb_photo" string="Photo"/>
+                </group>
+                <group string="Second Duodenum">
+                  <field name="egd_exam_second_duodenum_normal" string="Normal"/>
+                  <field name="egd_exam_second_duodenum_note" string="Abnormal / Description"/>
+                  <field name="egd_exam_second_duodenum_photo" string="Photo"/>
+                </group>
+              </group>
+            </page>
+            <page string="EGD Findings" invisible="procedure_type != 'egd'">
+              <group>
+                <group>
+                  <field name="egd_erosive_esophagitis_la_grade" string="Erosive Esophagitis LA Grade"/>
+                  <field name="egd_barrett_circumference_cm" string="Barrett C (cm)"/>
+                  <field name="egd_barrett_maximal_cm" string="Barrett M (cm)"/>
+                  <field name="egd_barrett_visible_lesion" string="Barrett Visible Lesion"/>
+                  <field name="egd_erefs_edema" string="EREFS Edema"/>
+                  <field name="egd_erefs_rings" string="EREFS Rings"/>
+                  <field name="egd_erefs_exudates" string="EREFS Exudates"/>
+                  <field name="egd_erefs_furrows" string="EREFS Furrows"/>
+                  <field name="egd_erefs_stricture" string="EREFS Stricture"/>
+                  <field name="egd_forrest_classification" string="Forrest Classification"/>
+                </group>
+                <group>
+                  <field name="egd_standardized_score_name" string="Standardized Score System"/>
+                  <field name="egd_standardized_score_value" string="Standardized Score Value"/>
+                  <field name="egd_esophagus_finding"/>
+                  <field name="egd_stomach_finding"/>
+                  <field name="egd_duodenum_finding"/>
+                  <field name="egd_impression"/>
+                </group>
+              </group>
+            </page>
+            <page string="EGD Therapy And Plan" invisible="procedure_type != 'egd'">
+              <group>
+                <group>
+                  <field name="egd_therapy_performed" string="Therapy Summary"/>
+                  <field name="egd_hemostasis_method"/>
+                  <field name="egd_dilation_type"/>
+                  <field name="egd_dilation_diameter_mm"/>
+                  <field name="egd_variceal_other_therapy" string="Variceal / Other Therapy"/>
+                  <field name="egd_therapy_outcome"/>
+                  <field name="egd_outcome_details"/>
+                </group>
+                <group>
+                  <field name="egd_h_pylori_plan" string="H. pylori Plan"/>
+                  <field name="egd_medication_therapy"/>
+                  <field name="egd_followup_surveillance"/>
+                  <field name="egd_result_communication_planned" string="Patient Communication Planned"/>
+                  <field name="egd_referrer_communication_planned" string="Referrer Communication Planned"/>
+                  <field name="informed_patient"/>
+                  <field name="informed_referrer"/>
+                  <field name="written_instructions_given"/>
+                </group>
+              </group>
+            </page>
+            <page string="ERCP Preprocedure" invisible="procedure_type != 'ercp'">
+              <group>
+                <group>
+                  <field name="ercp_indication"/>
+                  <field name="ercp_papilla_status"/>
+                  <field name="ercp_papilla_appearance"/>
+                  <field name="ercp_therapeutic_intent"/>
+                  <field name="ercp_imaging_reviewed"/>
+                  <field name="ercp_antibiotic_prophylaxis"/>
+                  <field name="ercp_rectal_nsaid"/>
+                </group>
+                <group>
+                  <field name="ercp_hydration_plan"/>
+                  <field name="ercp_pancreatic_stent_plan"/>
+                  <field name="ercp_rescue_plan"/>
+                  <field name="ercp_radiation_protection_verified"/>
+                  <field name="ercp_pregnancy_precautions"/>
+                </group>
+              </group>
+            </page>
+            <page string="ERCP Cannulation" invisible="procedure_type != 'ercp'">
+              <group>
+                <group>
+                  <field name="ercp_cannulation_success" string="Bile Duct Cannulation Successful"/>
+                  <field name="ercp_cannulation_technique"/>
+                  <field name="ercp_cannulation_contacts"/>
+                  <field name="ercp_cannulation_time_minutes"/>
+                  <field name="ercp_unintended_pd_access_count"/>
+                  <field name="ercp_pancreatic_duct_status"/>
+                  <field name="ercp_prophylactic_pd_stent"/>
+                  <field name="ercp_prophylactic_pd_stent_details"/>
+                </group>
+                <group>
+                  <field name="ercp_cholangiogram_cbd_mm"/>
+                  <field name="ercp_intrahepatic_ducts"/>
+                  <field name="ercp_stone_count"/>
+                  <field name="ercp_largest_stone_mm"/>
+                  <field name="ercp_stricture_site"/>
+                  <field name="ercp_leak_note"/>
+                  <field name="ercp_anatomy_other_findings"/>
+                  <field name="ercp_drainage_achieved"/>
+                  <field name="ercp_ducts_accessed"/>
+                </group>
+              </group>
+            </page>
+            <page string="ERCP Therapy" invisible="procedure_type != 'ercp'">
+              <group>
+                <group>
+                  <field name="ercp_sphincterotomy_performed"/>
+                  <field name="ercp_sphincterotomy_type"/>
+                  <field name="ercp_sphincterotomy_details"/>
+                  <field name="ercp_papillary_dilation_balloon_mm"/>
+                  <field name="ercp_stone_extraction_performed"/>
+                  <field name="ercp_stone_therapy"/>
+                  <field name="ercp_stricture_therapy"/>
+                </group>
+                <group>
+                  <field name="ercp_stent_placed"/>
+                  <field name="ercp_biliary_stent_type"/>
+                  <field name="ercp_stent_details"/>
+                  <field name="ercp_other_intervention"/>
+                </group>
+              </group>
+            </page>
+            <page string="ERCP Outcome" invisible="procedure_type != 'ercp'">
+              <group>
+                <group>
+                  <field name="ercp_fluoroscopy_time_minutes"/>
+                  <field name="ercp_dose_area_product"/>
+                  <field name="ercp_reference_air_kerma"/>
+                  <field name="ercp_images_acquired"/>
+                  <field name="ercp_dose_reduction_measures"/>
+                  <field name="ercp_dose_reduction_other"/>
+                  <field name="ercp_intended_therapy"/>
+                  <field name="ercp_technical_success"/>
+                  <field name="ercp_stone_clearance"/>
+                  <field name="ercp_biliary_drainage_outcome"/>
+                </group>
+                <group>
+                  <field name="ercp_immediate_adverse_event"/>
+                  <field name="ercp_complication_note"/>
+                  <field name="ercp_temporary_stent"/>
+                  <field name="ercp_removal_exchange_due"/>
+                  <field name="ercp_pd_stent"/>
+                  <field name="ercp_migration_passage_check"/>
+                  <field name="ercp_patient_contact_note"/>
+                  <field name="ercp_tracking_register_entered"/>
+                  <field name="ercp_repeat_intervention"/>
+                  <field name="ercp_repeat_intervention_timing"/>
+                  <field name="ercp_post_ercp_pancreatitis"/>
+                  <field name="ercp_significant_bleeding"/>
+                  <field name="ercp_cholangitis_or_cholecystitis"/>
+                  <field name="ercp_unplanned_hospital_visit"/>
+                  <field name="ercp_impression"/>
+                </group>
+              </group>
+            </page>
+            <page string="EUS Examination" invisible="procedure_type != 'eus'">
+              <group>
+                <group>
+                  <field name="eus_route"/>
+                  <field name="eus_echoendoscope"/>
+                  <field name="eus_intent"/>
+                  <field name="eus_upper_esophagus"/>
+                  <field name="eus_upper_stomach"/>
+                  <field name="eus_upper_duodenum"/>
+                  <field name="eus_pancreas_examined"/>
+                  <field name="eus_cbd_examined"/>
+                  <field name="eus_gallbladder_examined"/>
+                </group>
+                <group>
+                  <field name="eus_liver_examined"/>
+                  <field name="eus_adrenal_examined"/>
+                  <field name="eus_mediastinum_examined"/>
+                  <field name="eus_nodes_examined"/>
+                  <field name="eus_doppler_used"/>
+                  <field name="eus_relevant_anatomy_documented"/>
+                  <field name="eus_photo_anatomy"/>
+                  <field name="photo_pathology" string="Pathology Images"/>
+                  <field name="eus_technical_limitation"/>
+                  <field name="eus_immediate_adverse_event_note" string="Immediate AE Note"/>
+                  <field name="eus_regions_examined"/>
+                </group>
+              </group>
+            </page>
+            <page string="EUS Lesion And Stage" invisible="procedure_type != 'eus'">
+              <group>
+                <group>
+                  <field name="eus_target_lesion_present"/>
+                  <field name="eus_target_location"/>
+                  <field name="eus_target_size_mm"/>
+                  <field name="eus_echogenicity"/>
+                  <field name="eus_margins"/>
+                  <field name="eus_vascular_relation"/>
+                  <field name="eus_nodes_note"/>
+                  <field name="eus_image_reference"/>
+                </group>
+                <group>
+                  <field name="eus_cancer_site"/>
+                  <field name="eus_staging_system"/>
+                  <field name="eus_t_stage"/>
+                  <field name="eus_n_stage"/>
+                  <field name="eus_m_features"/>
+                  <field name="eus_vascular_invasion"/>
+                  <field name="eus_overall_stage"/>
+                  <field name="eus_management_implication"/>
+                </group>
+              </group>
+            </page>
+            <page string="EUS Tissue Acquisition" invisible="procedure_type != 'eus'">
+              <group>
+                <group>
+                  <field name="eus_tissue_target"/>
+                  <field name="eus_approach"/>
+                  <field name="eus_needle_type"/>
+                  <field name="eus_needle_gauge"/>
+                  <field name="eus_needle_design"/>
+                  <field name="eus_fna_performed"/>
+                  <field name="eus_fnb_performed"/>
+                  <field name="eus_passes_count"/>
+                  <field name="eus_rose_status"/>
+                </group>
+                <group>
+                  <field name="eus_mose_status"/>
+                  <field name="eus_specimen_type"/>
+                  <field name="eus_container_labels"/>
+                  <field name="eus_adequacy_status"/>
+                  <field name="eus_adequacy_note"/>
+                  <field name="eus_label_verified"/>
+                  <field name="eus_complication_type"/>
+                  <field name="eus_antibiotics_after_sampling"/>
+                </group>
+              </group>
+            </page>
+            <page string="EUS Intervention And Plan" invisible="procedure_type != 'eus'">
+              <group>
+                <group>
+                  <field name="eus_intervention_procedure"/>
+                  <field name="eus_intervention_target_route"/>
+                  <field name="eus_device_stent"/>
+                  <field name="eus_technical_success"/>
+                  <field name="eus_clinical_plan"/>
+                  <field name="eus_immediate_adverse_event"/>
+                </group>
+                <group>
+                  <field name="eus_impression"/>
+                  <field name="eus_pathology_cytology_status"/>
+                  <field name="eus_followup_imaging_or_procedure"/>
+                  <field name="eus_multidisciplinary_referral"/>
+                  <field name="informed_patient"/>
+                  <field name="informed_referrer"/>
+                  <field name="written_instructions_given"/>
+                </group>
+              </group>
+            </page>
+            <page string="Specimens">
+              <field name="specimen_ids" nolabel="1">
+                <list editable="bottom">
+                  <field name="sequence"/>
+                  <field name="container_label"/>
+                  <field name="specimen_site"/>
+                  <field name="specimen_count"/>
+                  <field name="test_question"/>
+                  <field name="label_verified"/>
+                </list>
+              </field>
+            </page>
+            <page string="Images">
+              <field name="image_attachment_ids" nolabel="1">
+                <list editable="bottom">
+                  <field name="image_file" widget="image" filename="file_name"/>
+                  <field name="caption"/>
+                  <field name="file_name"/>
+                  <field name="content_type" readonly="1"/>
+                  <field name="size_bytes" readonly="1"/>
+                  <field name="uploaded_at" readonly="1"/>
+                  <field name="uploaded_by_user_ref" readonly="1"/>
+                  <field name="external_image_id" readonly="1"/>
+                </list>
+                <form string="Case Image">
+                  <group>
+                    <group>
+                      <field name="image_file" widget="image" filename="file_name"/>
+                      <field name="file_name"/>
+                      <field name="caption"/>
+                    </group>
+                    <group>
+                      <field name="external_image_id" readonly="1"/>
+                      <field name="content_type" readonly="1"/>
+                      <field name="size_bytes" readonly="1"/>
+                      <field name="uploaded_at" readonly="1"/>
+                      <field name="uploaded_by_user_ref" readonly="1"/>
+                    </group>
+                  </group>
+                </form>
+              </field>
+            </page>
+            <page string="Tasks">
+              <field name="task_ids" nolabel="1">
+                <list editable="bottom">
+                  <field name="name" readonly="1"/>
+                  <field name="external_task_id" readonly="1"/>
+                  <field name="task_type"/>
+                  <field name="task_owner_user_id"/>
+                  <field name="due_date"/>
+                  <field name="task_status"/>
+                  <field name="resolution_note"/>
+                  <field name="closed_at" readonly="1"/>
+                </list>
+              </field>
+            </page>
+            <page string="Report And Review">
+              <group>
+                <group>
+                  <field name="followup_state" readonly="1"/>
+                  <field name="template_version" readonly="1"/>
+                  <field name="payload_version" readonly="1"/>
+                  <field name="validation_summary" readonly="1"/>
+                  <field name="reopen_reason" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+                  <field name="reopened_at" readonly="1"/>
+                  <field name="reopened_by_user_ref" readonly="1"/>
+                </group>
+                <group>
+                  <field name="report_narrative_snapshot" readonly="1"/>
+                  <field name="clinical_payload_json" readonly="1"/>
+                </group>
+              </group>
+            </page>
+            <page string="Audit Trail" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin">
+              <group>
+                <field name="revision_ids" nolabel="1" readonly="1">
+                  <list create="false" edit="false" delete="false">
+                    <field name="revision_number"/>
+                    <field name="finalized_at"/>
+                    <field name="finalized_by_user_ref"/>
+                    <field name="template_version"/>
+                    <field name="pdf_attachment_id"/>
+                  </list>
+                </field>
+              </group>
+              <group>
+                <field name="audit_event_ids" nolabel="1" readonly="1">
+                  <list create="false" edit="false" delete="false">
+                    <field name="create_date"/>
+                    <field name="actor_user_id"/>
+                    <field name="actor_role"/>
+                    <field name="event_type"/>
+                    <field name="entity_type"/>
+                    <field name="entity_ref"/>
+                    <field name="reason"/>
+                  </list>
+                </field>
+              </group>
+            </page>
+            <page string="Sync Audit" groups="phd_ass_bridge.group_phd_ass_admin">
+              <field name="sync_event_ids" nolabel="1" readonly="1">
+                <list create="false" edit="false" delete="false">
+                  <field name="create_date"/>
+                  <field name="event_type"/>
+                  <field name="sync_direction"/>
+                  <field name="status"/>
+                  <field name="payload_version"/>
+                  <field name="message"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_followup_task_list" model="ir.ui.view">
+    <field name="name">phd.ass.followup.task.list</field>
+    <field name="model">phd.ass.followup.task</field>
+    <field name="arch" type="xml">
+      <list string="Follow-Up Tasks">
+        <field name="name" readonly="1"/>
+        <field name="external_task_id" readonly="1"/>
+        <field name="case_id"/>
+        <field name="task_type"/>
+        <field name="task_owner_user_id"/>
+        <field name="due_date"/>
+        <field name="task_status"/>
+        <field name="last_synced_at" readonly="1"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_followup_task_form" model="ir.ui.view">
+    <field name="name">phd.ass.followup.task.form</field>
+    <field name="model">phd.ass.followup.task</field>
+    <field name="arch" type="xml">
+      <form string="Follow-Up Task">
+        <sheet>
+          <group>
+            <group>
+              <field name="name" readonly="1"/>
+              <field name="external_task_id" readonly="1"/>
+              <field name="case_id"/>
+              <field name="task_type"/>
+            </group>
+            <group>
+              <field name="task_owner_user_id"/>
+              <field name="task_owner_user_ref" readonly="1"/>
+              <field name="due_date"/>
+              <field name="task_status"/>
+              <field name="last_synced_at" readonly="1"/>
+            </group>
+          </group>
+          <group>
+            <field name="resolution_note"/>
+            <field name="closed_at" readonly="1"/>
+            <field name="closed_by_user_ref" readonly="1"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_sync_event_list" model="ir.ui.view">
+    <field name="name">phd.ass.sync.event.list</field>
+    <field name="model">phd.ass.sync.event</field>
+    <field name="arch" type="xml">
+      <list string="Sync Events" create="false" edit="false" delete="false">
+        <field name="create_date"/>
+        <field name="case_id"/>
+        <field name="event_type"/>
+        <field name="sync_direction"/>
+        <field name="status"/>
+        <field name="payload_version"/>
+        <field name="message"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_revision_list" model="ir.ui.view">
+    <field name="name">phd.ass.case.revision.list</field>
+    <field name="model">phd.ass.case.revision</field>
+    <field name="arch" type="xml">
+      <list string="Finalized Revisions" create="false" edit="false" delete="false">
+        <field name="case_id"/>
+        <field name="revision_number"/>
+        <field name="finalized_at"/>
+        <field name="finalized_by_user_ref"/>
+        <field name="template_version"/>
+        <field name="pdf_attachment_id"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_audit_event_list" model="ir.ui.view">
+    <field name="name">phd.ass.audit.event.list</field>
+    <field name="model">phd.ass.audit.event</field>
+    <field name="arch" type="xml">
+      <list string="Audit Events" create="false" edit="false" delete="false">
+        <field name="create_date"/>
+        <field name="case_id"/>
+        <field name="actor_user_id"/>
+        <field name="actor_role"/>
+        <field name="event_type"/>
+        <field name="entity_type"/>
+        <field name="entity_ref"/>
+        <field name="reason"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_reopen_wizard_form" model="ir.ui.view">
+    <field name="name">phd.ass.case.reopen.wizard.form</field>
+    <field name="model">phd.ass.case.reopen.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Reopen Finalized Case">
+        <sheet>
+          <group>
+            <field name="case_id"/>
+            <field name="reason" placeholder="Explain why the finalized case is being reopened."/>
+          </group>
+          <footer>
+            <button name="action_confirm_reopen" type="object" string="Confirm Reopen" class="oe_highlight"/>
+            <button string="Cancel" special="cancel"/>
+          </footer>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_facility_list" model="ir.ui.view">
+    <field name="name">phd.ass.facility.list</field>
+    <field name="model">phd.ass.facility</field>
+    <field name="arch" type="xml">
+      <list string="Facilities">
+        <field name="name"/>
+        <field name="code"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_facility_form" model="ir.ui.view">
+    <field name="name">phd.ass.facility.form</field>
+    <field name="model">phd.ass.facility</field>
+    <field name="arch" type="xml">
+      <form string="Facility">
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="code"/>
+            </group>
+            <group>
+              <field name="active"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Units">
+              <field name="unit_ids" nolabel="1">
+                <list editable="bottom">
+                  <field name="name"/>
+                  <field name="code"/>
+                  <field name="active"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_facility_unit_list" model="ir.ui.view">
+    <field name="name">phd.ass.facility.unit.list</field>
+    <field name="model">phd.ass.facility.unit</field>
+    <field name="arch" type="xml">
+      <list string="Units">
+        <field name="full_name" readonly="1"/>
+        <field name="facility_id"/>
+        <field name="name"/>
+        <field name="code"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_facility_unit_form" model="ir.ui.view">
+    <field name="name">phd.ass.facility.unit.form</field>
+    <field name="model">phd.ass.facility.unit</field>
+    <field name="arch" type="xml">
+      <form string="Unit">
+        <sheet>
+          <group>
+            <group>
+              <field name="facility_id"/>
+              <field name="name"/>
+              <field name="code"/>
+            </group>
+            <group>
+              <field name="full_name" readonly="1"/>
+              <field name="active"/>
+            </group>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_care_team_list" model="ir.ui.view">
+    <field name="name">phd.ass.care.team.list</field>
+    <field name="model">phd.ass.care.team</field>
+    <field name="arch" type="xml">
+      <list string="Care Teams">
+        <field name="name" readonly="1"/>
+        <field name="facility_id"/>
+        <field name="endoscopist_user_id"/>
+        <field name="nurse_user_id"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_care_team_form" model="ir.ui.view">
+    <field name="name">phd.ass.care.team.form</field>
+    <field name="model">phd.ass.care.team</field>
+    <field name="arch" type="xml">
+      <form string="Care Team">
+        <sheet>
+          <group>
+            <group>
+              <field name="facility_id"/>
+              <field name="endoscopist_user_id"/>
+              <field name="nurse_user_id"/>
+            </group>
+            <group>
+              <field name="active"/>
+              <field name="note"/>
+            </group>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_users_form_phd_ass_facilities" model="ir.ui.view">
+    <field name="name">res.users.form.phd.ass.facilities</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base.view_users_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//page[@name='access_rights']/group" position="inside">
+        <group string="Endoscopy Workspace" groups="phd_ass_bridge.group_phd_ass_admin">
+          <field name="phd_ass_facility_ids" widget="many2many_tags"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_phd_ass_cases" model="ir.actions.act_window">
+    <field name="name">Clinical Cases</field>
+    <field name="res_model">phd.ass.case</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_phd_ass_followup_tasks" model="ir.actions.act_window">
+    <field name="name">Follow-Up Tasks</field>
+    <field name="res_model">phd.ass.followup.task</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_phd_ass_sync_events" model="ir.actions.act_window">
+    <field name="name">Sync Events</field>
+    <field name="res_model">phd.ass.sync.event</field>
+    <field name="view_mode">list</field>
+  </record>
+
+  <record id="action_phd_ass_audit_events" model="ir.actions.act_window">
+    <field name="name">Audit Log</field>
+    <field name="res_model">phd.ass.audit.event</field>
+    <field name="view_mode">list</field>
+  </record>
+
+  <record id="action_phd_ass_facilities" model="ir.actions.act_window">
+    <field name="name">Facilities</field>
+    <field name="res_model">phd.ass.facility</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_phd_ass_facility_units" model="ir.actions.act_window">
+    <field name="name">Units</field>
+    <field name="res_model">phd.ass.facility.unit</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_phd_ass_care_teams" model="ir.actions.act_window">
+    <field name="name">Care Teams</field>
+    <field name="res_model">phd.ass.care.team</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <menuitem id="menu_phd_ass_root" name="Endoscopy Workspace" sequence="80" web_icon="phd_ass_bridge,static/description/icon.png" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_cases" name="Clinical Cases" parent="menu_phd_ass_root" action="action_phd_ass_cases" sequence="10" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_followup_tasks" name="Follow-Up Tasks" parent="menu_phd_ass_root" action="action_phd_ass_followup_tasks" sequence="20" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_reference_data" name="Reference Data" parent="menu_phd_ass_root" sequence="30" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_facilities" name="Facilities" parent="menu_phd_ass_reference_data" action="action_phd_ass_facilities" sequence="10" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_facility_units" name="Units" parent="menu_phd_ass_reference_data" action="action_phd_ass_facility_units" sequence="20" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_care_teams" name="Care Teams" parent="menu_phd_ass_reference_data" action="action_phd_ass_care_teams" sequence="30" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_audit_events" name="Audit Log" parent="menu_phd_ass_root" action="action_phd_ass_audit_events" sequence="40" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+  <menuitem id="menu_phd_ass_sync_events" name="Sync Events" parent="menu_phd_ass_root" action="action_phd_ass_sync_events" sequence="50" groups="phd_ass_bridge.group_phd_ass_admin"/>
+</odoo>

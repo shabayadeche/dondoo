@@ -1,0 +1,24 @@
+{
+  "name": "@phd-ass/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "db:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@fastify/cors": "11.3.0",
+    "@phd-ass/config": "file:../../packages/config",
+    "@phd-ass/domain": "file:../../packages/domain",
+    "@prisma/client": "7.9.1",
+    "fastify": "5.12.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "prisma": "7.9.1"
+  }
+}

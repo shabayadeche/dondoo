@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Dondoo",
+    "slug": "endoscopy-reporting-app",
+    "scheme": "phdass",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

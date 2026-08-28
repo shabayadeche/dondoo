@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phd-ass-clinical-api"
+version = "0.1.0"
+description = "FastAPI clinical workflow service for PhD-Ass."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.117,<0.118",
+  "python-multipart>=0.0.20,<0.1",
+  "uvicorn[standard]>=0.38,<0.39",
+  "pydantic-settings>=2.11,<2.12",
+  "sqlalchemy>=2.0,<2.1",
+  "alembic>=1.16,<1.17",
+  "psycopg[binary]>=3.2,<3.3",
+]
+
+[project.optional-dependencies]
+test = [
+  "httpx2>=2.12,<2.13",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

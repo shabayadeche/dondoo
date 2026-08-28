@@ -1,0 +1,7 @@
+{
+  "name": "@phd-ass/odoo-addons",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted Odoo addons for the hybrid endoscopy reporting architecture."
+}
+

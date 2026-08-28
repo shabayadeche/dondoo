@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="module_category_phd_ass" model="ir.module.category">
+    <field name="name">Endoscopy Workspace</field>
+    <field name="description">Access roles for the endoscopy clinical workspace.</field>
+    <field name="sequence">80</field>
+  </record>
+
+  <record id="privilege_phd_ass_workspace" model="res.groups.privilege">
+    <field name="name">Clinical Workspace Roles</field>
+    <field name="description">Role definitions for the endoscopy clinical workspace.</field>
+    <field name="placeholder">No clinical workspace role</field>
+    <field name="sequence">80</field>
+    <field name="category_id" ref="phd_ass_bridge.module_category_phd_ass"/>
+  </record>
+
+  <record id="group_phd_ass_endoscopist" model="res.groups">
+    <field name="name">Clinical Author - Endoscopist</field>
+    <field name="privilege_id" ref="phd_ass_bridge.privilege_phd_ass_workspace"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+  </record>
+
+  <record id="group_phd_ass_nurse" model="res.groups">
+    <field name="name">Clinical Author - Nurse</field>
+    <field name="privilege_id" ref="phd_ass_bridge.privilege_phd_ass_workspace"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+  </record>
+
+  <record id="group_phd_ass_operations_admin" model="res.groups">
+    <field name="name">Clinical Operations Admin</field>
+    <field name="privilege_id" ref="phd_ass_bridge.privilege_phd_ass_workspace"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+  </record>
+
+  <record id="group_phd_ass_admin" model="res.groups">
+    <field name="name">Clinical Workspace Admin</field>
+    <field name="privilege_id" ref="phd_ass_bridge.privilege_phd_ass_workspace"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+  </record>
+
+  <record id="rule_phd_ass_facility_scoped_read" model="ir.rule">
+    <field name="name">Facilities - Assigned Users</field>
+    <field name="model_id" ref="model_phd_ass_facility"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse')), (4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_facility_admin_all" model="ir.rule">
+    <field name="name">Facilities - Admin</field>
+    <field name="model_id" ref="model_phd_ass_facility"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_facility_unit_scoped_read" model="ir.rule">
+    <field name="name">Facility Units - Assigned Users</field>
+    <field name="model_id" ref="model_phd_ass_facility_unit"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse')), (4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_facility_unit_admin_all" model="ir.rule">
+    <field name="name">Facility Units - Admin</field>
+    <field name="model_id" ref="model_phd_ass_facility_unit"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_case_author_all" model="ir.rule">
+    <field name="name">Clinical Cases - Authors</field>
+    <field name="model_id" ref="model_phd_ass_case"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('facility_id', 'in', user.phd_ass_facility_ids.ids), '|', '|', ('create_uid', '=', user.id), ('endoscopist_user_id', '=', user.id), ('assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_case_operations_read" model="ir.rule">
+    <field name="name">Clinical Cases - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_case"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_case_admin_all" model="ir.rule">
+    <field name="name">Clinical Cases - Admin</field>
+    <field name="model_id" ref="model_phd_ass_case"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_care_team_author_read" model="ir.rule">
+    <field name="name">Care Teams - Authors</field>
+    <field name="model_id" ref="model_phd_ass_care_team"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('facility_id', 'in', user.phd_ass_facility_ids.ids), '|', ('endoscopist_user_id', '=', user.id), ('nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_care_team_operations_all" model="ir.rule">
+    <field name="name">Care Teams - Operations</field>
+    <field name="model_id" ref="model_phd_ass_care_team"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_care_team_admin_all" model="ir.rule">
+    <field name="name">Care Teams - Admin</field>
+    <field name="model_id" ref="model_phd_ass_care_team"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_segment_author_all" model="ir.rule">
+    <field name="name">Case Segments - Authors</field>
+    <field name="model_id" ref="model_phd_ass_case_segment"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids), '|', '|', ('case_id.create_uid', '=', user.id), ('case_id.endoscopist_user_id', '=', user.id), ('case_id.assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_segment_operations_read" model="ir.rule">
+    <field name="name">Case Segments - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_case_segment"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_segment_admin_all" model="ir.rule">
+    <field name="name">Case Segments - Admin</field>
+    <field name="model_id" ref="model_phd_ass_case_segment"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_lesion_author_all" model="ir.rule">
+    <field name="name">Case Lesions - Authors</field>
+    <field name="model_id" ref="model_phd_ass_case_lesion"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids), '|', '|', ('case_id.create_uid', '=', user.id), ('case_id.endoscopist_user_id', '=', user.id), ('case_id.assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_lesion_operations_read" model="ir.rule">
+    <field name="name">Case Lesions - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_case_lesion"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_lesion_admin_all" model="ir.rule">
+    <field name="name">Case Lesions - Admin</field>
+    <field name="model_id" ref="model_phd_ass_case_lesion"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_specimen_author_all" model="ir.rule">
+    <field name="name">Case Specimens - Authors</field>
+    <field name="model_id" ref="model_phd_ass_case_specimen"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids), '|', '|', ('case_id.create_uid', '=', user.id), ('case_id.endoscopist_user_id', '=', user.id), ('case_id.assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_specimen_operations_read" model="ir.rule">
+    <field name="name">Case Specimens - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_case_specimen"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_specimen_admin_all" model="ir.rule">
+    <field name="name">Case Specimens - Admin</field>
+    <field name="model_id" ref="model_phd_ass_case_specimen"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_case_image_author_all" model="ir.rule">
+    <field name="name">Case Images - Authors</field>
+    <field name="model_id" ref="model_phd_ass_case_image"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids), '|', '|', ('case_id.create_uid', '=', user.id), ('case_id.endoscopist_user_id', '=', user.id), ('case_id.assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_case_image_operations_read" model="ir.rule">
+    <field name="name">Case Images - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_case_image"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_case_image_admin_all" model="ir.rule">
+    <field name="name">Case Images - Admin</field>
+    <field name="model_id" ref="model_phd_ass_case_image"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_task_author_all" model="ir.rule">
+    <field name="name">Follow-Up Tasks - Authors</field>
+    <field name="model_id" ref="model_phd_ass_followup_task"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist')), (4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['&amp;', ('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids), '|', '|', '|', ('task_owner_user_id', '=', user.id), ('case_id.create_uid', '=', user.id), ('case_id.endoscopist_user_id', '=', user.id), ('case_id.assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_task_operations_all" model="ir.rule">
+    <field name="name">Follow-Up Tasks - Operations</field>
+    <field name="model_id" ref="model_phd_ass_followup_task"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_task_admin_all" model="ir.rule">
+    <field name="name">Follow-Up Tasks - Admin</field>
+    <field name="model_id" ref="model_phd_ass_followup_task"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_case_revision_operations_read" model="ir.rule">
+    <field name="name">Case Revisions - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_case_revision"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_case_revision_endoscopist_read" model="ir.rule">
+    <field name="name">Case Revisions - Endoscopist Cases</field>
+    <field name="model_id" ref="model_phd_ass_case_revision"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist'))]"/>
+    <field name="domain_force">[('case_id.endoscopist_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_case_revision_admin_read" model="ir.rule">
+    <field name="name">Case Revisions - Admin</field>
+    <field name="model_id" ref="model_phd_ass_case_revision"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_audit_event_operations_read" model="ir.rule">
+    <field name="name">Audit Events - Operations Review</field>
+    <field name="model_id" ref="model_phd_ass_audit_event"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('case_id.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_audit_event_endoscopist_read" model="ir.rule">
+    <field name="name">Audit Events - Endoscopist Cases</field>
+    <field name="model_id" ref="model_phd_ass_audit_event"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist'))]"/>
+    <field name="domain_force">[('case_id.endoscopist_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_audit_event_admin_read" model="ir.rule">
+    <field name="name">Audit Events - Admin</field>
+    <field name="model_id" ref="model_phd_ass_audit_event"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_sync_event_admin_read" model="ir.rule">
+    <field name="name">Sync Events - Admin Review</field>
+    <field name="model_id" ref="model_phd_ass_sync_event"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+</odoo>

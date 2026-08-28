@@ -1,0 +1,35 @@
+{
+  "name": "phd-ass",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@11.16.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:pwa": "npm run dev --workspace @phd-ass/pwa",
+    "dev:app": "npm run start --workspace @phd-ass/app",
+    "dev:api": "npm run dev --workspace @phd-ass/api",
+    "build:pwa": "npm run build --workspace @phd-ass/pwa",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:generate": "npm run db:generate --workspace @phd-ass/api",
+    "clinical:db:migrate": "powershell -ExecutionPolicy Bypass -File .\\scripts\\clinical-db-migrate.ps1",
+    "clinical:start": "powershell -ExecutionPolicy Bypass -File .\\scripts\\start-clinical-api.ps1",
+    "clinical:stop": "powershell -ExecutionPolicy Bypass -File .\\scripts\\stop-clinical-api.ps1",
+    "odoo:start": "powershell -ExecutionPolicy Bypass -File .\\scripts\\start-odoo.ps1",
+    "odoo:stop": "powershell -ExecutionPolicy Bypass -File .\\scripts\\stop-odoo.ps1",
+    "odoo:proxy:start": "powershell -ExecutionPolicy Bypass -File .\\scripts\\start-odoo-localhost-proxy.ps1",
+    "odoo:proxy:stop": "powershell -ExecutionPolicy Bypass -File .\\scripts\\stop-odoo-localhost-proxy.ps1",
+    "stack:start": "powershell -ExecutionPolicy Bypass -File .\\scripts\\start-local-stack.ps1",
+    "stack:stop": "powershell -ExecutionPolicy Bypass -File .\\scripts\\stop-local-stack.ps1",
+    "stack:status": "powershell -ExecutionPolicy Bypass -File .\\scripts\\status-local-stack.ps1"
+  },
+  "devDependencies": {
+    "@types/node": "26.2.0",
+    "tsx": "4.23.12",
+    "typescript": "7.0.2"
+  }
+}

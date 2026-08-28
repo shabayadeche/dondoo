@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_phd_ass_patient_list" model="ir.ui.view">
+    <field name="name">phd.ass.patient.list</field>
+    <field name="model">phd.ass.patient</field>
+    <field name="arch" type="xml">
+      <list string="Patients">
+        <header>
+          <button name="action_assign_latest_endoscopist" type="object" string="Create Assignments From Latest Cases" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+        </header>
+        <field name="name" readonly="1"/>
+        <field name="patient_identifier"/>
+        <field name="sex"/>
+        <field name="dob_or_age"/>
+        <field name="medical_record_number"/>
+        <field name="last_case_datetime" readonly="1"/>
+        <field name="case_count" readonly="1"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_patient_form" model="ir.ui.view">
+    <field name="name">phd.ass.patient.form</field>
+    <field name="model">phd.ass.patient</field>
+    <field name="arch" type="xml">
+      <form string="Patient">
+        <header>
+          <button name="action_assign_latest_endoscopist" type="object" string="Create Assignment From Latest Case" class="oe_highlight" groups="phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button name="action_open_cases" type="object" class="oe_stat_button" icon="fa-stethoscope">
+              <field name="case_count" widget="statinfo" string="Cases"/>
+            </button>
+          </div>
+          <group>
+            <group>
+              <field name="name" readonly="1"/>
+              <field name="patient_identifier"/>
+              <field name="full_name"/>
+              <field name="medical_record_number"/>
+            </group>
+            <group>
+              <field name="sex"/>
+              <field name="dob_or_age"/>
+              <field name="phone"/>
+              <field name="email"/>
+            </group>
+          </group>
+          <group>
+            <group>
+              <field name="last_case_datetime" readonly="1"/>
+              <field name="active"/>
+            </group>
+            <group>
+              <field name="notes"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Endoscopist Assignments">
+              <field name="care_relationship_ids" context="{'default_patient_id': active_id}">
+                <list editable="bottom">
+                  <field name="facility_id"/>
+                  <field name="facility_unit_id" domain="[('facility_id', '=', facility_id)]"/>
+                  <field name="endoscopist_user_id" domain="[('share', '=', False)]"/>
+                  <field name="relationship_type"/>
+                  <field name="start_date"/>
+                  <field name="end_date"/>
+                  <field name="is_primary"/>
+                  <field name="active"/>
+                  <field name="note"/>
+                </list>
+              </field>
+            </page>
+            <page string="Clinical Cases">
+              <field name="case_ids" nolabel="1" readonly="1">
+                <list create="false" edit="false" delete="false">
+                  <field name="name"/>
+                  <field name="procedure_type"/>
+                  <field name="procedure_datetime"/>
+                  <field name="facility_id"/>
+                  <field name="endoscopist_user_id"/>
+                  <field name="case_status"/>
+                  <field name="followup_state"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_phd_ass_case_form_patient_admin" model="ir.ui.view">
+    <field name="name">phd.ass.case.form.patient.admin</field>
+    <field name="model">phd.ass.case</field>
+    <field name="inherit_id" ref="phd_ass_bridge.view_phd_ass_case_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='patient_identifier']" position="after">
+        <field name="patient_id"/>
+      </xpath>
+      <xpath expr="//field[@name='dob_or_age']" position="after">
+        <field name="patient_registry_name" readonly="1"/>
+        <field name="patient_registry_mrn" readonly="1"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_phd_ass_patients" model="ir.actions.act_window">
+    <field name="name">Patients</field>
+    <field name="res_model">phd.ass.patient</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <menuitem id="menu_phd_ass_patients" name="Patients" parent="phd_ass_bridge.menu_phd_ass_root" action="action_phd_ass_patients" sequence="15" groups="phd_ass_bridge.group_phd_ass_endoscopist,phd_ass_bridge.group_phd_ass_nurse,phd_ass_bridge.group_phd_ass_operations_admin,phd_ass_bridge.group_phd_ass_admin"/>
+</odoo>

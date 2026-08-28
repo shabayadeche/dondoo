@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  role      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Patient {
+  id                String   @id @default(cuid())
+  patientIdentifier String
+  fullNameOptional  String?
+  dobOptional       DateTime?
+  ageTextOptional   String?
+  sex               String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  cases             Case[]
+}
+
+model Case {
+  id                      String          @id @default(cuid())
+  patientId               String
+  procedureType           String
+  caseStatus              String
+  procedureDatetime       DateTime
+  facilityUnit            String
+  endoscopistUserId       String
+  assistantNurseUserId    String?
+  referrerService         String?
+  finalizedAt             DateTime?
+  finalizedByUserId       String?
+  templateVersion         String?
+  reportNarrativeSnapshot String?
+  pdfAssetRef             String?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  patient                 Patient         @relation(fields: [patientId], references: [id])
+  safety                  CaseSafety?
+  colonoscopyDetails      ColonoscopyDetails?
+  segmentRows             ColonoscopySegment[]
+  lesions                 ColonoscopyLesion[]
+  specimens               Specimen[]
+  followupTasks           FollowupTask[]
+  auditEvents             AuditEvent[]
+}
+
+model CaseSafety {
+  id                 String   @id @default(cuid())
+  caseId              String   @unique
+  indication          String
+  priority            String
+  relevantHistory     String?
+  asaClass            String
+  allergies           String?
+  antithromboticPlan  String
+  consentDocumented   Boolean
+  teamPauseCompleted  Boolean
+  sedationAnesthesia  String
+  monitorSpo2         Boolean  @default(false)
+  monitorHr           Boolean  @default(false)
+  monitorBp           Boolean  @default(false)
+  monitorEcg          Boolean  @default(false)
+  monitorCapnography  Boolean  @default(false)
+  antibioticsStatus   String?
+  pregnancyStatus     String?
+  updatedAt           DateTime @updatedAt
+  case                Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model ColonoscopyDetails {
+  id                                  String   @id @default(cuid())
+  caseId                               String   @unique
+  bowelPrepAgent                      String?
+  prepQuality                         String
+  bbpsRight                           Int?
+  bbpsTransverse                      Int?
+  bbpsLeft                            Int?
+  bbpsTotal                           Int?
+  insertionTime                       DateTime?
+  cecumReached                        Boolean
+  cecalLandmarkAppendicealOrifice     Boolean  @default(false)
+  cecalLandmarkIleocecalValve         Boolean  @default(false)
+  photoCecum                          Boolean  @default(false)
+  photoPathology                      Boolean  @default(false)
+  terminalIleumStatus                 String?
+  withdrawalTimeMinutes               Int?
+  technicalLimitation                 String?
+  technicalLimitationNote             String?
+  adverseEventDuringProcedure         Boolean  @default(false)
+  adverseEventNote                    String?
+  ucMayoScore                         String?
+  crohnScore                          String?
+  diseaseExtent                       String?
+  impression                          String
+  pathologyStatus                     String
+  surveillanceIntervalValue           String?
+  surveillanceIntervalPendingPathology Boolean @default(false)
+  surveillanceIntervalReason          String?
+  surveillanceIntervalReasonNote      String?
+  adverseEventPlan                    String
+  adverseEventPlanNote                String?
+  informedPatient                     Boolean  @default(false)
+  informedReferrer                    Boolean  @default(false)
+  writtenInstructionsGiven            Boolean  @default(false)
+  updatedAt                           DateTime @updatedAt
+  case                                Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model ColonoscopySegment {
+  id          String   @id @default(cuid())
+  caseId       String
+  segmentName  String
+  normal       Boolean?
+  findingNote  String?
+  photoTaken   Boolean  @default(false)
+  sortOrder    Int
+  case         Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([caseId, segmentName])
+}
+
+model ColonoscopyLesion {
+  id                  String   @id @default(cuid())
+  caseId               String
+  sortOrder            Int
+  location             String
+  sizeMm               Int
+  morphology           String
+  resectionMethod      String
+  completeResection    Boolean
+  retrieved            Boolean
+  specimenContainerRef String?
+  case                 Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model Specimen {
+  id             String   @id @default(cuid())
+  caseId          String
+  containerLabel  String
+  specimenSite    String
+  specimenCount   Int?
+  testQuestion    String?
+  labelVerified   Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  case            Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model FollowupTask {
+  id             String   @id @default(cuid())
+  caseId          String
+  taskType        String
+  ownerUserId     String
+  status          String
+  dueDate         DateTime?
+  resolutionNote  String?
+  closedAt        DateTime?
+  closedByUserId  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  case            Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id          String   @id @default(cuid())
+  caseId       String?
+  actorUserId  String
+  actorRole    String
+  eventType    String
+  entityType   String
+  entityId     String
+  reason       String?
+  payloadJson  Json
+  createdAt    DateTime @default(now())
+  case         Case?    @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}

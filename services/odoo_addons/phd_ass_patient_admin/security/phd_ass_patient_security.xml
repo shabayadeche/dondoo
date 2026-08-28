@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="rule_phd_ass_patient_endoscopist_scope" model="ir.rule">
+    <field name="name">Patients - Endoscopist Scope</field>
+    <field name="model_id" ref="model_phd_ass_patient"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist'))]"/>
+    <field name="domain_force">['|', '|', ('create_uid', '=', user.id), ('case_ids.endoscopist_user_id', '=', user.id), ('care_relationship_ids.endoscopist_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_patient_nurse_scope" model="ir.rule">
+    <field name="name">Patients - Nurse Scope</field>
+    <field name="model_id" ref="model_phd_ass_patient"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_nurse'))]"/>
+    <field name="domain_force">['|', ('create_uid', '=', user.id), ('case_ids.assistant_nurse_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_patient_operations_scope" model="ir.rule">
+    <field name="name">Patients - Operations Facility Scope</field>
+    <field name="model_id" ref="model_phd_ass_patient"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">['|', '|', ('create_uid', '=', user.id), ('case_ids.facility_id', 'in', user.phd_ass_facility_ids.ids), ('care_relationship_ids.facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_patient_admin_all" model="ir.rule">
+    <field name="name">Patients - Admin</field>
+    <field name="model_id" ref="model_phd_ass_patient"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_patient_relationship_endoscopist_scope" model="ir.rule">
+    <field name="name">Endoscopist Assignments - Own</field>
+    <field name="model_id" ref="model_phd_ass_patient_care_relationship"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_endoscopist'))]"/>
+    <field name="domain_force">[('endoscopist_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="0"/>
+    <field name="perm_create" eval="0"/>
+    <field name="perm_unlink" eval="0"/>
+  </record>
+
+  <record id="rule_phd_ass_patient_relationship_operations_scope" model="ir.rule">
+    <field name="name">Endoscopist Assignments - Operations Facility Scope</field>
+    <field name="model_id" ref="model_phd_ass_patient_care_relationship"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_operations_admin'))]"/>
+    <field name="domain_force">[('facility_id', 'in', user.phd_ass_facility_ids.ids)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+
+  <record id="rule_phd_ass_patient_relationship_admin_all" model="ir.rule">
+    <field name="name">Endoscopist Assignments - Admin</field>
+    <field name="model_id" ref="model_phd_ass_patient_care_relationship"/>
+    <field name="groups" eval="[(4, ref('phd_ass_bridge.group_phd_ass_admin'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="perm_read" eval="1"/>
+    <field name="perm_write" eval="1"/>
+    <field name="perm_create" eval="1"/>
+    <field name="perm_unlink" eval="1"/>
+  </record>
+</odoo>
