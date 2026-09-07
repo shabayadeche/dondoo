@@ -157,6 +157,7 @@ class StartCasePayload(BaseModel):
     procedureDatetime: str = Field(min_length=1)
     dobOrAge: str = Field(min_length=1)
     sex: SexOption
+    patientIdentityVerified: bool = False
     facilityUnit: str = Field(min_length=1)
     facilityCode: str | None = None
     endoscopistUserId: str = Field(min_length=1)

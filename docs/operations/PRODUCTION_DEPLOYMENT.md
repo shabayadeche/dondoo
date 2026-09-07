@@ -62,6 +62,19 @@ Recommended production PWA env:
 - leave `VITE_CLINICAL_API_BASE_URL` blank when Nginx proxies the API on the same public host
 - set it explicitly only if the API is exposed on a different public origin
 
+### GitHub Actions deployment
+
+The repository workflow at `.github/workflows/ci-cd.yml` runs PWA type checks and builds plus the clinical API acceptance suite for pull requests and pushes to `develop` or `main`. A successful push to `main` deploys through AWS Systems Manager, builds the exact Git commit on the instance, publishes it as an immutable release, and atomically repoints `/srv/phd-ass/pwa/current`.
+
+Create a GitHub Environment named `production`, protect it with the required reviewer(s), then configure these environment variables:
+
+- `AWS_DEPLOY_ROLE_ARN`: IAM role assumed through GitHub Actions OIDC, restricted to the production environment
+- `PRODUCTION_INSTANCE_ID`: the managed EC2 instance ID for `app.kumbuo.com`
+- `AWS_REGION`: optional; defaults to `eu-north-1`
+- `PRODUCTION_SMOKE_URL`: optional public health URL, for example `https://app.kumbuo.com/health`
+
+The instance must be registered with Systems Manager (`AmazonSSMManagedInstanceCore`) and its local checkout at `/srv/phd-ass/current` must have a read-only GitHub deploy credential supplied through the approved secret manager. The GitHub OIDC role needs only `ssm:SendCommand` and command-invocation read access for this instance and the `AWS-RunShellScript` document. The current `app.kumbuo.com` instance (`i-05d3d64d172807382`, `eu-north-1`) needs an IAM instance profile before this job can run. The workflow deploys only the PWA; FastAPI service or database changes continue to use the controlled host release procedure below.
+
 ## 3. Provision The Clinical API Runtime
 
 From the deployment checkout:

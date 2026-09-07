@@ -62,7 +62,13 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
                 "team_pause_completed": True,
                 "sedation_anesthesia": "Conscious sedation",
                 "prep_quality": "adequate",
+                "bbps_right": 3,
+                "bbps_transverse": 3,
+                "bbps_left": 3,
                 "cecum_reached": True,
+                "cecal_landmark_appendiceal_orifice": True,
+                "cecal_landmark_ileocecal_valve": True,
+                "photo_cecum": True,
                 "segment_exam": [{"segment_name": "cecum", "normal": True, "photo_taken": True}],
                 "impression": "Normal colonoscopy.",
                 "adverse_event_plan": "routine_discharge",
@@ -90,7 +96,7 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
         case_id = self._create_ready_case(headers)
 
         ready_response = self.client.post(f"/api/cases/{case_id}/actions/mark_ready_for_signoff", headers=headers, json={})
-        self.assertEqual(ready_response.status_code, 200)
+        self.assertEqual(ready_response.status_code, 200, ready_response.text)
 
         finalize_response = self.client.post(f"/api/cases/{case_id}/actions/finalize", headers=headers, json={})
         self.assertEqual(finalize_response.status_code, 200)
@@ -192,7 +198,13 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
                 "team_pause_completed": True,
                 "sedation_anesthesia": "Conscious sedation",
                 "prep_quality": "adequate",
+                "bbps_right": 3,
+                "bbps_transverse": 3,
+                "bbps_left": 3,
                 "cecum_reached": True,
+                "cecal_landmark_appendiceal_orifice": True,
+                "cecal_landmark_ileocecal_valve": True,
+                "photo_cecum": True,
                 "segment_exam": [{"segment_name": "cecum", "normal": True, "photo_taken": True}],
                 "impression": "Single polyp removed.",
                 "pathology_status": "pending_tracking_required",
@@ -324,13 +336,14 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
         facility_unit: str = "MAIN-R1",
         endoscopist_user_id: str = "dr.njoroge",
         assistant_nurse_user_id: str = "nurse.akinyi",
-    ) -> dict[str, str]:
+    ) -> dict[str, object]:
         return {
             "procedureType": "colonoscopy",
             "patientIdentifier": patient_identifier,
             "procedureDatetime": "2026-08-25T08:30:00Z",
             "dobOrAge": "54 years",
             "sex": "female",
+            "patientIdentityVerified": True,
             "facilityUnit": facility_unit,
             "endoscopistUserId": endoscopist_user_id,
             "referrerService": "Gastroenterology Clinic",
@@ -349,7 +362,13 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
                 "team_pause_completed": True,
                 "sedation_anesthesia": "Conscious sedation",
                 "prep_quality": "adequate",
+                "bbps_right": 3,
+                "bbps_transverse": 3,
+                "bbps_left": 3,
                 "cecum_reached": True,
+                "cecal_landmark_appendiceal_orifice": True,
+                "cecal_landmark_ileocecal_valve": True,
+                "photo_cecum": True,
                 "segment_exam": [{"segment_name": "cecum", "normal": True, "photo_taken": True}],
                 "impression": "Normal colonoscopy.",
                 "adverse_event_plan": "routine_discharge",

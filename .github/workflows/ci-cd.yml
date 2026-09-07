@@ -1,0 +1,122 @@
+name: CI and production PWA deployment
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pwa:
+    name: PWA checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck --workspace @phd-ass/pwa
+      - run: npm run build:pwa
+
+  clinical-api:
+    name: Clinical API tests
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: services/clinical_api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: services/clinical_api/pyproject.toml
+
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e '.[test]'
+      - run: python -m unittest discover -s tests -v
+
+  deploy-pwa:
+    name: Deploy PWA to production
+    needs: [pwa, clinical-api]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+    concurrency:
+      group: production-pwa
+      cancel-in-progress: false
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
+      AWS_DEPLOY_ROLE_ARN: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+      PRODUCTION_INSTANCE_ID: ${{ vars.PRODUCTION_INSTANCE_ID }}
+      PRODUCTION_SMOKE_URL: ${{ vars.PRODUCTION_SMOKE_URL }}
+    steps:
+      - name: Configure AWS credentials through GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Publish immutable PWA release through Systems Manager
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$AWS_DEPLOY_ROLE_ARN"
+          test -n "$PRODUCTION_INSTANCE_ID"
+          cat > deploy-pwa.sh <<'REMOTE'
+          set -euo pipefail
+          release_sha="RELEASE_SHA_PLACEHOLDER"
+          repository_root="/srv/phd-ass/current"
+          pwa_root="/srv/phd-ass/pwa"
+          release_dir="${pwa_root}/releases/${release_sha}"
+
+          cd "$repository_root"
+          git fetch --quiet origin main
+          git checkout --detach --quiet "$release_sha"
+          npm ci
+          npm run build:pwa
+
+          mkdir -p "${pwa_root}/releases"
+          if [ ! -d "$release_dir" ]; then
+            staging_dir="$(mktemp -d "${pwa_root}/releases/.${release_sha}.XXXXXX")"
+            trap 'rm -rf "$staging_dir"' EXIT
+            cp -a apps/pwa/dist/. "$staging_dir/"
+            mv "$staging_dir" "$release_dir"
+          fi
+
+          ln -sfn "$release_dir" "${pwa_root}/current"
+          REMOTE
+
+          sed -i "s/RELEASE_SHA_PLACEHOLDER/${GITHUB_SHA}/" deploy-pwa.sh
+          jq -n --rawfile deployment deploy-pwa.sh '{commands: [$deployment]}' > ssm-parameters.json
+          command_id="$(aws ssm send-command \
+            --document-name AWS-RunShellScript \
+            --instance-ids "$PRODUCTION_INSTANCE_ID" \
+            --comment "Deploy Dondoo PWA ${GITHUB_SHA}" \
+            --parameters file://ssm-parameters.json \
+            --query 'Command.CommandId' \
+            --output text)"
+          aws ssm wait command-executed --command-id "$command_id" --instance-id "$PRODUCTION_INSTANCE_ID"
+          status="$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$PRODUCTION_INSTANCE_ID" --query Status --output text)"
+          aws ssm get-command-invocation --command-id "$command_id" --instance-id "$PRODUCTION_INSTANCE_ID" --query '{Status:Status,Output:StandardOutputContent,Error:StandardErrorContent}'
+          test "$status" = Success
+
+      - name: Smoke test public health endpoint
+        if: env.PRODUCTION_SMOKE_URL != ''
+        shell: bash
+        run: curl --fail --retry 5 --retry-all-errors --max-time 15 "$PRODUCTION_SMOKE_URL"

@@ -162,6 +162,7 @@ def create_start_case(
         procedure_datetime=payload.procedureDatetime,
         dob_or_age=payload.dobOrAge,
         sex=payload.sex,
+        patient_identity_verified=payload.patientIdentityVerified,
         facility_unit=unit_option["label"] if unit_option else payload.facilityUnit,
         facility_code=unit_option.get("facilityCode") if unit_option else payload.facilityCode,
         facility_unit_code=unit_option.get("code") if unit_option else None,
