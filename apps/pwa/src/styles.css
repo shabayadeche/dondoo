@@ -1691,7 +1691,9 @@ body {
   }
 
   .workspace-shell {
-    padding-bottom: 112px;
+    /* Keep the last form action above the fixed navigation, including on
+       devices with a home-indicator safe area. */
+    padding-bottom: calc(112px + env(safe-area-inset-bottom));
   }
 
   .workspace-header {
@@ -1711,7 +1713,7 @@ body {
     position: fixed;
     left: 12px;
     right: 12px;
-    bottom: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
     z-index: 20;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1725,9 +1727,10 @@ body {
   }
 
   .floating-help-dock {
-    left: 16px;
-    right: 16px;
-    bottom: 104px;
+    /* A second fixed control covered the lower actions on mobile. Keep help
+       in the normal document flow while the compact navigation is visible. */
+    position: static;
+    margin-top: 20px;
     justify-items: stretch;
   }
 
@@ -1740,7 +1743,7 @@ body {
 @media (max-width: 720px) {
   .login-shell,
   .workspace-shell {
-    padding: 16px;
+    padding: 16px 16px calc(112px + env(safe-area-inset-bottom));
   }
 
   .login-panel {
