@@ -127,6 +127,10 @@ jobs:
 
           mkdir -p "$pwa_root/releases"
           if [ ! -d "$repository_root/.git" ]; then
+            if [ -e "$repository_root" ]; then
+              backup_root="${repository_root}.prebootstrap.$(date -u +%Y%m%dT%H%M%SZ)"
+              mv "$repository_root" "$backup_root"
+            fi
             mkdir -p "$(dirname "$repository_root")"
             git clone --branch main --depth 1 git@github.com:shabayadeche/dondoo.git "$repository_root"
           fi
