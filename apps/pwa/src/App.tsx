@@ -1047,7 +1047,6 @@ export default function App() {
   const shellWarningMessage = (bundle?.warnings ?? []).join(" ");
   const connectionLabel = getConnectionLabel(health.status);
   const errorPresentation = error ? getErrorPresentation(error, activeScreen) : null;
-  const selectedWorkflowSteps = caseForm.procedureType ? meta.workflowStepsByProcedure[caseForm.procedureType] ?? meta.workflowSteps : meta.workflowSteps;
   const caseWorkflowSteps = caseDetail ? meta.workflowStepsByProcedure[caseDetail.procedure_type] ?? meta.workflowSteps : meta.workflowSteps;
 
   const filteredCases = useMemo(() => {
@@ -2148,7 +2147,6 @@ export default function App() {
               patientRelationshipLoading={patientRelationshipLoading}
               patientSearchResults={patientSearchResults}
               onSelectPatient={handleSelectPatient}
-              selectedWorkflowSteps={selectedWorkflowSteps}
               setCaseForm={updateCaseForm}
             />
           ) : null}
@@ -2206,6 +2204,12 @@ export default function App() {
           title="Dashboard quick guide"
           summary="Use the dashboard to see what needs attention now, then open Cases or Tasks for the full work queue."
           sections={[
+            {
+              eyebrow: "Getting started",
+              title: "Start a clean case",
+              icon: "checklist",
+              items: startCaseChecks
+            },
             {
               eyebrow: "At a glance",
               title: "What the dashboard shows",
@@ -2649,7 +2653,6 @@ function NewProcedureView({
   patientRelationshipLoading,
   patientSearchResults,
   onSelectPatient,
-  selectedWorkflowSteps,
   setCaseForm
 }: {
   caseForm: StartCaseForm;
@@ -2665,7 +2668,6 @@ function NewProcedureView({
   patientRelationshipLoading: boolean;
   patientSearchResults: PatientLookupOption[];
   onSelectPatient: (patient: PatientLookupOption) => void;
-  selectedWorkflowSteps: WorkflowStep[];
   setCaseForm: <K extends keyof StartCaseForm>(field: K, value: StartCaseForm[K]) => void;
 }) {
   const assignmentOverride = patientRelationshipSuggestion && (
@@ -2682,24 +2684,8 @@ function NewProcedureView({
     caseForm.facilityUnit &&
     caseForm.endoscopistUserId
   );
-  const helpSections: HelpDockSection[] = [
-    {
-      eyebrow: "Workflow guide",
-      title: `${caseTypeLabel} pathway`,
-      icon: "workflow",
-      items: selectedWorkflowSteps.map((step) => ({ label: step.label, detail: step.description })),
-      numbered: true
-    },
-    {
-      eyebrow: "Start-case checks",
-      title: "Open a clean draft",
-      icon: "checklist",
-      items: startCaseChecks
-    }
-  ];
   return (
-    <>
-      <section className="view-stack">
+    <section className="view-stack">
         <article className="panel">
         <div className="panel-header">
           <div>
@@ -2800,6 +2786,7 @@ function NewProcedureView({
                   ))}
                 </select>
               </label>
+              <p className="field-help">Choose a case type to set up the correct clinical record. Procedure guidance is available while documenting the case.</p>
             </div>
           </section>
 
@@ -2880,16 +2867,7 @@ function NewProcedureView({
           </button>
         </form>
         </article>
-      </section>
-      {caseForm.procedureType ? (
-        <FloatingHelpDock
-          label="Guide and checks"
-          title={`${caseTypeLabel} start guide`}
-          summary="Keep the pathway and start checks one tap away without permanently taking space from the form."
-          sections={helpSections}
-        />
-      ) : null}
-    </>
+    </section>
   );
 }
 
