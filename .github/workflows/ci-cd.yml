@@ -149,7 +149,16 @@ jobs:
             staging_dir=""
           fi
 
-          ln -sfn "$release_dir" "${pwa_root}/current"
+          current_link="${pwa_root}/current"
+          # A bootstrap may have created `current` as a directory. `ln -sfn`
+          # would place a link *inside* that directory and leave Nginx serving
+          # its stale files, so migrate it once before switching releases.
+          if [ -e "$current_link" ] && [ ! -L "$current_link" ]; then
+            legacy_dir="${pwa_root}/releases/legacy-current-$(date -u +%Y%m%dT%H%M%SZ)"
+            mv "$current_link" "$legacy_dir"
+          fi
+          ln -sfn "$release_dir" "$current_link"
+          test "$(readlink -f "$current_link")" = "$release_dir"
           BASH_REMOTE
           REMOTE
 
