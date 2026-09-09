@@ -157,9 +157,13 @@ jobs:
             --parameters file://ssm-parameters.json \
             --query 'Command.CommandId' \
             --output text)"
+          set +e
           aws ssm wait command-executed --command-id "$command_id" --instance-id "$PRODUCTION_INSTANCE_ID"
+          wait_status=$?
+          set -e
           status="$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$PRODUCTION_INSTANCE_ID" --query Status --output text)"
           aws ssm get-command-invocation --command-id "$command_id" --instance-id "$PRODUCTION_INSTANCE_ID" --query '{Status:Status,Output:StandardOutputContent,Error:StandardErrorContent}'
+          test "$wait_status" -eq 0
           test "$status" = Success
 
       - name: Smoke test public health endpoint
