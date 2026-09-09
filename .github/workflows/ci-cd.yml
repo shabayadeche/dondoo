@@ -80,6 +80,8 @@ jobs:
           test -n "$PRODUCTION_INSTANCE_ID"
           test -n "$PRODUCTION_GIT_DEPLOY_KEY_SECRET_ID"
           cat > deploy-pwa.sh <<'REMOTE'
+          #!/bin/sh
+          exec bash -s <<'BASH_REMOTE'
           set -euo pipefail
           release_sha="RELEASE_SHA_PLACEHOLDER"
           aws_region="AWS_REGION_PLACEHOLDER"
@@ -144,6 +146,7 @@ jobs:
           fi
 
           ln -sfn "$release_dir" "${pwa_root}/current"
+          BASH_REMOTE
           REMOTE
 
           sed -i "s/RELEASE_SHA_PLACEHOLDER/${GITHUB_SHA}/" deploy-pwa.sh
