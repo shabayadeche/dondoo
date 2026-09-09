@@ -63,6 +63,7 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
       AWS_DEPLOY_ROLE_ARN: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
       PRODUCTION_INSTANCE_ID: ${{ vars.PRODUCTION_INSTANCE_ID }}
+      PRODUCTION_GIT_DEPLOY_KEY_SECRET_ID: ${{ vars.PRODUCTION_GIT_DEPLOY_KEY_SECRET_ID }}
       PRODUCTION_SMOKE_URL: ${{ vars.PRODUCTION_SMOKE_URL }}
     steps:
       - name: Configure AWS credentials through GitHub OIDC
@@ -77,14 +78,58 @@ jobs:
           set -euo pipefail
           test -n "$AWS_DEPLOY_ROLE_ARN"
           test -n "$PRODUCTION_INSTANCE_ID"
+          test -n "$PRODUCTION_GIT_DEPLOY_KEY_SECRET_ID"
           cat > deploy-pwa.sh <<'REMOTE'
           set -euo pipefail
           release_sha="RELEASE_SHA_PLACEHOLDER"
+          aws_region="AWS_REGION_PLACEHOLDER"
+          deploy_key_secret_id="GIT_DEPLOY_KEY_SECRET_ID_PLACEHOLDER"
           repository_root="/srv/phd-ass/current"
           pwa_root="/srv/phd-ass/pwa"
           release_dir="${pwa_root}/releases/${release_sha}"
+          key_file=""
+          aws_cli_dir=""
+          staging_dir=""
+          cleanup() {
+            [ -z "$key_file" ] || rm -f "$key_file"
+            [ -z "$aws_cli_dir" ] || rm -rf "$aws_cli_dir"
+            [ -z "$staging_dir" ] || rm -rf "$staging_dir"
+          }
+          trap cleanup EXIT
 
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y -qq ca-certificates curl git gnupg openssh-client python3 unzip
+          if ! command -v aws >/dev/null; then
+            aws_cli_dir="$(mktemp -d)"
+            curl -fsSL https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o "$aws_cli_dir/awscliv2.zip"
+            unzip -q "$aws_cli_dir/awscliv2.zip" -d "$aws_cli_dir"
+            "$aws_cli_dir/aws/install" --update
+          fi
+          if ! command -v node >/dev/null || [ "$(node -p 'process.versions.node.split(".")[0]')" -lt 22 ]; then
+            install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+            echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" > /etc/apt/sources.list.d/nodesource.list
+            apt-get update -qq
+            apt-get install -y -qq nodejs
+          fi
+
+          key_file="$(mktemp)"
+          aws secretsmanager get-secret-value \
+            --region "$aws_region" \
+            --secret-id "$deploy_key_secret_id" \
+            --query SecretString \
+            --output text | python3 -c 'import json, sys; print(json.load(sys.stdin)["privateKey"])' > "$key_file"
+          chmod 600 "$key_file"
+          export GIT_SSH_COMMAND="ssh -i $key_file -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+
+          mkdir -p "$pwa_root/releases"
+          if [ ! -d "$repository_root/.git" ]; then
+            mkdir -p "$(dirname "$repository_root")"
+            git clone --branch main --depth 1 git@github.com:shabayadeche/dondoo.git "$repository_root"
+          fi
           cd "$repository_root"
+          git remote set-url origin git@github.com:shabayadeche/dondoo.git
           git fetch --quiet origin main
           git checkout --detach --quiet "$release_sha"
           npm ci
@@ -93,15 +138,17 @@ jobs:
           mkdir -p "${pwa_root}/releases"
           if [ ! -d "$release_dir" ]; then
             staging_dir="$(mktemp -d "${pwa_root}/releases/.${release_sha}.XXXXXX")"
-            trap 'rm -rf "$staging_dir"' EXIT
             cp -a apps/pwa/dist/. "$staging_dir/"
             mv "$staging_dir" "$release_dir"
+            staging_dir=""
           fi
 
           ln -sfn "$release_dir" "${pwa_root}/current"
           REMOTE
 
           sed -i "s/RELEASE_SHA_PLACEHOLDER/${GITHUB_SHA}/" deploy-pwa.sh
+          sed -i "s|AWS_REGION_PLACEHOLDER|${AWS_REGION}|" deploy-pwa.sh
+          sed -i "s|GIT_DEPLOY_KEY_SECRET_ID_PLACEHOLDER|${PRODUCTION_GIT_DEPLOY_KEY_SECRET_ID}|" deploy-pwa.sh
           jq -n --rawfile deployment deploy-pwa.sh '{commands: [$deployment]}' > ssm-parameters.json
           command_id="$(aws ssm send-command \
             --document-name AWS-RunShellScript \
