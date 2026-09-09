@@ -88,7 +88,7 @@ type HelpDockSection = {
   numbered?: boolean;
 };
 
-const procedureOrder: StartCasePayload["procedureType"][] = ["colonoscopy", "egd", "ercp", "eus"];
+const procedureOrder: ProcedureType[] = ["colonoscopy", "egd", "ercp", "eus"];
 const sexOptions: SimpleOption[] = [
   { value: "female", label: "Female" },
   { value: "male", label: "Male" },
@@ -554,8 +554,12 @@ const defaultMeta: MetaPayload = {
     finalizedToday: 0
   }
 };
-const initialCaseForm: StartCasePayload = {
-  procedureType: "colonoscopy",
+type StartCaseForm = Omit<StartCasePayload, "procedureType"> & {
+  procedureType: ProcedureType | "";
+};
+
+const initialCaseForm: StartCaseForm = {
+  procedureType: "",
   patientIdentifier: "",
   procedureDatetime: "",
   dobOrAge: "",
@@ -868,20 +872,6 @@ function getDueMeta(dueDate?: string): { label: string; tone: StatusTone } {
   return { label: `Due ${formatShortDate(dueDate)}`, tone: "neutral" };
 }
 
-function getProcedureLeadLabel(procedureType: StartCasePayload["procedureType"]): string {
-  switch (procedureType) {
-    case "egd":
-      return "Scope start with upper GI checklist, sedation readiness, and findings capture for esophagus, stomach, and duodenum.";
-    case "ercp":
-      return "Capture therapeutic intent, access readiness, fluoroscopy safety, and post-procedure drainage or stent planning.";
-    case "eus":
-      return "Confirm route, scope choice, target anatomy, and tissue acquisition plan before opening the draft.";
-    case "colonoscopy":
-    default:
-      return "Open the draft with the core patient, timing, and team fields before moving into prep, insertion, and lesion capture.";
-  }
-}
-
 function countFinalizedToday(cases: CaseSummary[]): number {
   const now = new Date();
   return cases.filter((entry) => {
@@ -981,7 +971,7 @@ export default function App() {
   const [taskQuery, setTaskQuery] = useState("");
   const [caseSubmitting, setCaseSubmitting] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
-  const [caseForm, setCaseForm] = useState<StartCasePayload>(initialCaseForm);
+  const [caseForm, setCaseForm] = useState<StartCaseForm>(initialCaseForm);
   const caseFormTouchedFields = useRef<Set<string>>(new Set());
   const notifiedWorkIds = useRef<Set<string>>(new Set());
   const [patientRelationshipSuggestion, setPatientRelationshipSuggestion] = useState<PatientRelationshipSuggestion | null>(null);
@@ -1057,7 +1047,7 @@ export default function App() {
   const shellWarningMessage = (bundle?.warnings ?? []).join(" ");
   const connectionLabel = getConnectionLabel(health.status);
   const errorPresentation = error ? getErrorPresentation(error, activeScreen) : null;
-  const selectedWorkflowSteps = meta.workflowStepsByProcedure[caseForm.procedureType] ?? meta.workflowSteps;
+  const selectedWorkflowSteps = caseForm.procedureType ? meta.workflowStepsByProcedure[caseForm.procedureType] ?? meta.workflowSteps : meta.workflowSteps;
   const caseWorkflowSteps = caseDetail ? meta.workflowStepsByProcedure[caseDetail.procedure_type] ?? meta.workflowSteps : meta.workflowSteps;
 
   const filteredCases = useMemo(() => {
@@ -1176,16 +1166,8 @@ export default function App() {
       const nextForm = { ...current };
       let changed = false;
 
-      if (!current.facilityUnit && facilityUnitOptions[0]) {
-        nextForm.facilityUnit = facilityUnitOptions[0].code;
-        changed = true;
-      } else if (current.facilityUnit && !facilityUnitOptions.some((option) => option.code === current.facilityUnit)) {
-        nextForm.facilityUnit = facilityUnitOptions[0]?.code || "";
-        changed = true;
-      }
-
-      if (!current.facilityCode && facilityUnitOptions[0]?.facilityCode) {
-        nextForm.facilityCode = facilityUnitOptions[0].facilityCode;
+      if (current.facilityUnit && !facilityUnitOptions.some((option) => option.code === current.facilityUnit)) {
+        nextForm.facilityUnit = "";
         changed = true;
       }
 
@@ -1345,7 +1327,7 @@ export default function App() {
     startTransition(() => setActiveScreen(screen));
   }
 
-  function updateCaseForm<K extends keyof StartCasePayload>(field: K, value: StartCasePayload[K]) {
+  function updateCaseForm<K extends keyof StartCaseForm>(field: K, value: StartCaseForm[K]) {
     caseFormTouchedFields.current.add(String(field));
     setCaseForm((current) => {
       const nextForm = {
@@ -1457,12 +1439,17 @@ export default function App() {
 
   async function handleCreateCase(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!caseForm.procedureType) {
+      setBanner({ tone: "error", text: "Select a case type before creating a draft." });
+      return;
+    }
     setCaseSubmitting(true);
     setBanner(null);
 
     try {
       const response = await submitStartCase({
         ...caseForm,
+        procedureType: caseForm.procedureType,
         procedureDatetime: toIsoDatetime(caseForm.procedureDatetime)
       });
       await refreshWorkspace();
@@ -1475,8 +1462,6 @@ export default function App() {
       caseFormTouchedFields.current.clear();
       setCaseForm({
         ...initialCaseForm,
-        facilityUnit: facilityUnitOptions[0]?.code || "",
-        referrerService: referrerServiceOptions[0]?.value || "",
         endoscopistUserId: session?.primaryRole === "endoscopist" ? session.login : "",
         assistantNurseUserId: session?.primaryRole === "nurse" ? session.login : ""
       });
@@ -2667,7 +2652,7 @@ function NewProcedureView({
   selectedWorkflowSteps,
   setCaseForm
 }: {
-  caseForm: StartCasePayload;
+  caseForm: StartCaseForm;
   caseSubmitting: boolean;
   facilityUnitOptions: FacilityUnitLookupOption[];
   facilityOptions: { code: string; label: string }[];
@@ -2681,16 +2666,26 @@ function NewProcedureView({
   patientSearchResults: PatientLookupOption[];
   onSelectPatient: (patient: PatientLookupOption) => void;
   selectedWorkflowSteps: WorkflowStep[];
-  setCaseForm: <K extends keyof StartCasePayload>(field: K, value: StartCasePayload[K]) => void;
+  setCaseForm: <K extends keyof StartCaseForm>(field: K, value: StartCaseForm[K]) => void;
 }) {
   const assignmentOverride = patientRelationshipSuggestion && (
     (caseForm.facilityCode && caseForm.facilityCode !== patientRelationshipSuggestion.facilityCode) ||
     (caseForm.endoscopistUserId && caseForm.endoscopistUserId !== patientRelationshipSuggestion.endoscopistUserId)
   );
+  const caseTypeLabel = caseForm.procedureType ? formatProcedureLabel(caseForm.procedureType) : "Case type required";
+  const canCreateDraft = Boolean(
+    caseForm.procedureType &&
+    caseForm.patientIdentifier.trim() &&
+    caseForm.dobOrAge.trim() &&
+    caseForm.procedureDatetime &&
+    caseForm.facilityCode &&
+    caseForm.facilityUnit &&
+    caseForm.endoscopistUserId
+  );
   const helpSections: HelpDockSection[] = [
     {
       eyebrow: "Workflow guide",
-      title: `${formatProcedureLabel(caseForm.procedureType)} pathway`,
+      title: `${caseTypeLabel} pathway`,
       icon: "workflow",
       items: selectedWorkflowSteps.map((step) => ({ label: step.label, detail: step.description })),
       numbered: true
@@ -2711,21 +2706,7 @@ function NewProcedureView({
             <p className="eyebrow">Draft starter</p>
             <h2>Patient, timing, and team</h2>
           </div>
-          <span className="status-chip tone-accent">{formatProcedureLabel(caseForm.procedureType)}</span>
-        </div>
-
-        <div className="procedure-picker" role="tablist" aria-label="Procedure type">
-          {procedureOrder.map((procedure) => (
-            <button
-              key={procedure}
-              className={`procedure-option${caseForm.procedureType === procedure ? " is-active" : ""}`}
-              type="button"
-              onClick={() => setCaseForm("procedureType", procedure)}
-            >
-              <strong>{formatProcedureLabel(procedure)}</strong>
-              <span>{getProcedureLeadLabel(procedure)}</span>
-            </button>
-          ))}
+          <span className={`status-chip tone-${caseForm.procedureType ? "accent" : "warning"}`}>{caseTypeLabel}</span>
         </div>
 
         <form className="case-form" onSubmit={(event) => void onSubmit(event)}>
@@ -2799,6 +2780,32 @@ function NewProcedureView({
           <section className="form-section">
             <div className="section-heading">
               <div>
+                <p className="eyebrow">Case type</p>
+                <h3>Select the procedure</h3>
+              </div>
+            </div>
+            <div className="field-grid">
+              <label>
+                Case type
+                <select
+                  value={caseForm.procedureType}
+                  onChange={(event) => setCaseForm("procedureType", event.target.value as ProcedureType | "")}
+                  required
+                >
+                  <option value="">Select case type</option>
+                  {procedureOrder.map((procedure) => (
+                    <option key={procedure} value={procedure}>
+                      {formatProcedureLabel(procedure)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section className="form-section">
+            <div className="section-heading">
+              <div>
                 <p className="eyebrow">Schedule and room</p>
                 <h3>Where and when the case starts</h3>
               </div>
@@ -2822,7 +2829,8 @@ function NewProcedureView({
               </label>
               <label>
                 Facility unit
-                <select value={caseForm.facilityUnit} onChange={(event) => setCaseForm("facilityUnit", event.target.value)}>
+                <select value={caseForm.facilityUnit} onChange={(event) => setCaseForm("facilityUnit", event.target.value)} required>
+                  <option value="">Select unit</option>
                   {facilityUnitOptions.map((option) => (
                     <option key={option.code} value={option.code}>
                       {option.label}
@@ -2866,18 +2874,21 @@ function NewProcedureView({
             </div>
           </section>
 
-          <button className="primary-button" type="submit" disabled={caseSubmitting}>
+          {!canCreateDraft ? <p className="field-help">Complete the required patient, case type, schedule, location, and endoscopist fields to create a draft.</p> : null}
+          <button className="primary-button" type="submit" disabled={caseSubmitting || !canCreateDraft}>
             <ButtonLabel icon="new-case">{caseSubmitting ? "Creating draft..." : "Create draft case"}</ButtonLabel>
           </button>
         </form>
         </article>
       </section>
-      <FloatingHelpDock
-        label="Guide and checks"
-        title={`${formatProcedureLabel(caseForm.procedureType)} start guide`}
-        summary="Keep the pathway and start checks one tap away without permanently taking space from the form."
-        sections={helpSections}
-      />
+      {caseForm.procedureType ? (
+        <FloatingHelpDock
+          label="Guide and checks"
+          title={`${caseTypeLabel} start guide`}
+          summary="Keep the pathway and start checks one tap away without permanently taking space from the form."
+          sections={helpSections}
+        />
+      ) : null}
     </>
   );
 }
