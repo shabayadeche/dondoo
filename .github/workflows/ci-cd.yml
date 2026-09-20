@@ -138,6 +138,22 @@ jobs:
           git remote set-url origin git@github.com:shabayadeche/dondoo.git
           git fetch --quiet origin main
           git checkout --detach --quiet "$release_sha"
+
+          # The Clinical API runs from this immutable checkout as well. Restart
+          # it after switching revisions so its migration preflight and process
+          # use the same release as the PWA.
+          systemctl restart phd-ass-clinical-api.service
+          for attempt in $(seq 1 12); do
+            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:8000/health; then
+              break
+            fi
+            if [ "$attempt" = 12 ]; then
+              systemctl status phd-ass-clinical-api.service --no-pager >&2 || true
+              exit 1
+            fi
+            sleep 5
+          done
+
           npm ci
           npm run build:pwa
 

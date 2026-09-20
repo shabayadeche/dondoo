@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from datetime import date, datetime, timezone
 from functools import lru_cache
 from pathlib import Path
+import sqlite3
 from uuid import uuid4
 
 from sqlalchemy import JSON, Date, DateTime, ForeignKey, Integer, LargeBinary, String, Text, create_engine, event
@@ -165,6 +166,9 @@ def _engine_kwargs(database_url: str) -> dict:
 
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):  # noqa: ANN001, ARG001
+    if not isinstance(dbapi_connection, sqlite3.Connection):
+        return
+
     try:
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
