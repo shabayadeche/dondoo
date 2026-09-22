@@ -103,7 +103,7 @@ export type StartCasePayload = {
   procedureType: ProcedureType;
   patientIdentifier: string;
   procedureDatetime: string;
-  dobOrAge: string;
+  dobOrAge?: string;
   sex: SexOption;
   facilityUnit: string;
   facilityCode?: string;

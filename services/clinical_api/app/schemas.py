@@ -155,10 +155,10 @@ class StartCasePayload(BaseModel):
     procedureType: ProcedureType
     patientIdentifier: str = Field(min_length=1)
     procedureDatetime: str = Field(min_length=1)
-    dobOrAge: str = Field(min_length=1)
+    dobOrAge: str | None = None
     sex: SexOption
     patientIdentityVerified: bool = False
-    facilityUnit: str = Field(min_length=1)
+    facilityUnit: str | None = None
     facilityCode: str | None = None
     endoscopistUserId: str = Field(min_length=1)
     referrerService: str | None = None
@@ -252,7 +252,7 @@ class ClinicalDraftCasePayload(BaseModel):
     procedure_datetime: str = Field(min_length=1)
     dob_or_age: str | None = None
     sex: SexOption
-    facility_unit: str = Field(min_length=1)
+    facility_unit: str = ""
     facility_code: str | None = None
     facility_unit_code: str | None = None
     endoscopist_user_id: str | None = None

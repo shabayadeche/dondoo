@@ -548,7 +548,7 @@ class PhdAssCase(models.Model):
     sex = fields.Selection(SEX_SELECTION, required=True)
     facility_id = fields.Many2one("phd.ass.facility", string="Facility")
     facility_unit_id = fields.Many2one("phd.ass.facility.unit", string="Unit")
-    facility_unit = fields.Char(required=True)
+    facility_unit = fields.Char()
     endoscopist_user_id = fields.Many2one("res.users", string="Endoscopist", domain=[("share", "=", False)])
     endoscopist_user_ref = fields.Char(required=True)
     available_nurse_user_ids = fields.Many2many("res.users", compute="_compute_available_nurse_user_ids", string="Available Nurses")
@@ -1293,9 +1293,21 @@ class PhdAssCase(models.Model):
 
     @api.onchange("endoscopist_user_id")
     def _onchange_endoscopist_user_id(self):
+        if not self.facility_id:
+            inferred_facility = self._single_facility_for_endoscopist(self.endoscopist_user_id)
+            if inferred_facility:
+                self.facility_id = inferred_facility
         if self.assistant_nurse_user_id and not self._nurse_belongs_to_endoscopist(self.assistant_nurse_user_id, self.endoscopist_user_id, self.facility_id):
             self.assistant_nurse_user_id = False
             self.assistant_nurse_user_ref = False
+
+    def _single_facility_for_endoscopist(self, endoscopist):
+        if not endoscopist:
+            return self.env["phd.ass.facility"].browse()
+        facility_ids = self.env["phd.ass.care.team"].sudo().search(
+            [("active", "=", True), ("endoscopist_user_id", "=", endoscopist.id)]
+        ).mapped("facility_id")
+        return facility_ids if len(facility_ids) == 1 else self.env["phd.ass.facility"].browse()
 
     @api.constrains("facility_id", "endoscopist_user_id", "assistant_nurse_user_id")
     def _check_nurse_belongs_to_endoscopist(self):
@@ -1334,6 +1346,11 @@ class PhdAssCase(models.Model):
         facility_model = self.env["phd.ass.facility"].with_context(active_test=False)
         unit_model = self.env["phd.ass.facility.unit"].with_context(active_test=False)
         user_model = self.env["res.users"].with_context(active_test=False)
+
+        if not prepared.get("facility_id") and prepared.get("endoscopist_user_id"):
+            inferred_facility = self._single_facility_for_endoscopist(user_model.browse(prepared["endoscopist_user_id"]))
+            if inferred_facility:
+                prepared["facility_id"] = inferred_facility.id
 
         if "facility_id" in prepared and "facility_unit_id" not in prepared and len(self) == 1:
             record = self[0]

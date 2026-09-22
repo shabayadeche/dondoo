@@ -288,6 +288,38 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
         )
         self.assertEqual(therapeutic_create.status_code, 201)
 
+    def test_start_case_allows_an_unassigned_unit_and_nurse(self) -> None:
+        headers = self._login("dr.njoroge", "test-secret")
+        payload = self._start_case_payload(patient_identifier="PT-OPTIONAL-UNIT-001")
+        payload["facilityUnit"] = ""
+        payload["facilityCode"] = "MAIN"
+        payload.pop("dobOrAge")
+        payload.pop("assistantNurseUserId")
+
+        response = self.client.post("/api/cases", headers=headers, json=payload)
+
+        self.assertEqual(response.status_code, 201)
+        created = response.json()["payload"]
+        self.assertEqual(created["facility_code"], "MAIN")
+        self.assertEqual(created["facility_unit"], "")
+        self.assertIsNone(created["dob_or_age"])
+        self.assertIsNone(created["assistant_nurse_user_id"])
+
+    def test_start_case_infers_a_single_endoscopist_facility(self) -> None:
+        headers = self._login("dr.kamau", "test-secret")
+        payload = self._start_case_payload(
+            patient_identifier="PT-INFERRED-FACILITY-001",
+            facility_unit="",
+            endoscopist_user_id="dr.kamau",
+            assistant_nurse_user_id="",
+        )
+        payload.pop("facilityCode", None)
+
+        response = self.client.post("/api/cases", headers=headers, json=payload)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["payload"]["facility_code"], "DAY")
+
     def test_login_is_throttled_after_repeated_failures(self) -> None:
         for _ in range(2):
             failed = self.client.post("/api/session/login", json={"login": "dr.njoroge", "password": "wrong-secret"})

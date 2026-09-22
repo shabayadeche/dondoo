@@ -554,8 +554,9 @@ const defaultMeta: MetaPayload = {
     finalizedToday: 0
   }
 };
-type StartCaseForm = Omit<StartCasePayload, "procedureType"> & {
+type StartCaseForm = Omit<StartCasePayload, "procedureType" | "dobOrAge"> & {
   procedureType: ProcedureType | "";
+  dobOrAge: string;
 };
 
 const initialCaseForm: StartCaseForm = {
@@ -672,6 +673,11 @@ function filterNursesForCase(
   facilityCode: string | null | undefined,
 ): ClinicianLookupOption[] {
   return options.filter((option) => nurseMatchesEndoscopist(option, endoscopistUserId) && clinicianMatchesFacility(option, facilityCode));
+}
+
+function singleFacilityCode(option: ClinicianLookupOption | null | undefined): string | null {
+  const codes = [...new Set((option?.facilityCodes || []).map((code) => code.trim()).filter(Boolean))];
+  return codes.length === 1 ? codes[0] ?? null : null;
 }
 
 function formatFileSize(sizeBytes?: number | null): string {
@@ -1074,7 +1080,12 @@ export default function App() {
   }, [deferredTaskQuery, sortedTasks]);
 
   const selectedCaseFormUnit = lookups.facilityUnits.find((option) => option.code === caseForm.facilityUnit);
-  const selectedCaseFormFacilityCode = caseForm.facilityCode || selectedCaseFormUnit?.facilityCode || null;
+  const caseFormEndoscopist = lookups.endoscopists.find((option) => option.userId === caseForm.endoscopistUserId)
+    || (session?.primaryRole === "endoscopist" && session.login === caseForm.endoscopistUserId
+      ? { userId: session.login, label: session.displayName, role: "endoscopist" as const, facilityCodes: session.facilityCodes }
+      : null);
+  const inferredFacilityCode = singleFacilityCode(caseFormEndoscopist);
+  const selectedCaseFormFacilityCode = caseForm.facilityCode || selectedCaseFormUnit?.facilityCode || inferredFacilityCode || null;
 
   const endoscopistOptions = useMemo(() => {
     const byId = new Map<string, ClinicianLookupOption>();
@@ -1134,6 +1145,13 @@ export default function App() {
       return changed ? nextForm : current;
     });
   }, [session]);
+
+  useEffect(() => {
+    if (!inferredFacilityCode) {
+      return;
+    }
+    setCaseForm((current) => current.facilityCode ? current : { ...current, facilityCode: inferredFacilityCode });
+  }, [inferredFacilityCode]);
 
   useEffect(() => {
     setCaseForm((current) => {
@@ -1334,6 +1352,17 @@ export default function App() {
         [field]: value
       };
       if (field === "endoscopistUserId") {
+        const selectedEndoscopist = lookups.endoscopists.find((option) => option.userId === value)
+          || (session?.primaryRole === "endoscopist" && session.login === value
+            ? { userId: session.login, label: session.displayName, role: "endoscopist" as const, facilityCodes: session.facilityCodes }
+            : null);
+        const endoscopistFacilityCode = singleFacilityCode(selectedEndoscopist);
+        const selectedFacilityIsValid = !nextForm.facilityCode || Boolean(selectedEndoscopist?.facilityCodes?.includes(nextForm.facilityCode));
+        if (!selectedFacilityIsValid) {
+          nextForm.facilityCode = endoscopistFacilityCode || "";
+          nextForm.facilityUnit = "";
+          nextForm.assistantNurseUserId = "";
+        }
         const selectedNurse = nextForm.assistantNurseUserId
           ? allNurseOptions.find((option) => option.userId === nextForm.assistantNurseUserId)
           : null;
@@ -1448,6 +1477,7 @@ export default function App() {
     try {
       const response = await submitStartCase({
         ...caseForm,
+        ...(selectedCaseFormFacilityCode ? { facilityCode: selectedCaseFormFacilityCode } : {}),
         procedureType: caseForm.procedureType,
         procedureDatetime: toIsoDatetime(caseForm.procedureDatetime)
       });
@@ -2138,6 +2168,8 @@ export default function App() {
               caseSubmitting={caseSubmitting}
               facilityUnitOptions={facilityUnitOptions}
               facilityOptions={lookups.facilities}
+              resolvedFacilityCode={selectedCaseFormFacilityCode}
+              facilityIsInferred={Boolean(inferredFacilityCode && !caseForm.facilityCode)}
               referrerServiceOptions={referrerServiceOptions}
               endoscopistOptions={endoscopistOptions}
               nurseOptions={nurseOptions}
@@ -2644,6 +2676,8 @@ function NewProcedureView({
   caseSubmitting,
   facilityUnitOptions,
   facilityOptions,
+  resolvedFacilityCode,
+  facilityIsInferred,
   referrerServiceOptions,
   endoscopistOptions,
   nurseOptions,
@@ -2659,6 +2693,8 @@ function NewProcedureView({
   caseSubmitting: boolean;
   facilityUnitOptions: FacilityUnitLookupOption[];
   facilityOptions: { code: string; label: string }[];
+  resolvedFacilityCode: string | null;
+  facilityIsInferred: boolean;
   referrerServiceOptions: ValueLookupOption[];
   endoscopistOptions: ClinicianLookupOption[];
   nurseOptions: ClinicianLookupOption[];
@@ -2678,10 +2714,8 @@ function NewProcedureView({
   const canCreateDraft = Boolean(
     caseForm.procedureType &&
     caseForm.patientIdentifier.trim() &&
-    caseForm.dobOrAge.trim() &&
     caseForm.procedureDatetime &&
-    caseForm.facilityCode &&
-    caseForm.facilityUnit &&
+    resolvedFacilityCode &&
     caseForm.endoscopistUserId
   );
   return (
@@ -2736,8 +2770,8 @@ function NewProcedureView({
                 </p>
               ) : null}
               <label>
-                DOB or age
-                <input value={caseForm.dobOrAge} onChange={(event) => setCaseForm("dobOrAge", event.target.value)} required />
+                DOB or age (optional)
+                <input value={caseForm.dobOrAge || ""} onChange={(event) => setCaseForm("dobOrAge", event.target.value)} />
               </label>
               <label>
                 Sex
@@ -2799,8 +2833,8 @@ function NewProcedureView({
             </div>
             <div className="field-grid">
               <label>
-                Facility
-                <select value={caseForm.facilityCode || ""} onChange={(event) => setCaseForm("facilityCode", event.target.value)} required>
+                {facilityIsInferred ? "Facility (selected automatically)" : "Facility"}
+                <select value={caseForm.facilityCode || resolvedFacilityCode || ""} onChange={(event) => setCaseForm("facilityCode", event.target.value)} required={!facilityIsInferred}>
                   <option value="">Select facility</option>
                   {facilityOptions.map((option) => <option key={option.code} value={option.code}>{option.label}</option>)}
                 </select>
@@ -2815,8 +2849,8 @@ function NewProcedureView({
                 />
               </label>
               <label>
-                Facility unit
-                <select value={caseForm.facilityUnit} onChange={(event) => setCaseForm("facilityUnit", event.target.value)} required>
+                Facility unit (optional)
+                <select value={caseForm.facilityUnit} onChange={(event) => setCaseForm("facilityUnit", event.target.value)}>
                   <option value="">Select unit</option>
                   {facilityUnitOptions.map((option) => (
                     <option key={option.code} value={option.code}>
@@ -2848,7 +2882,7 @@ function NewProcedureView({
                 </select>
               </label>
               <label>
-                Assistant or nurse
+                Assistant or nurse (optional)
                 <select value={caseForm.assistantNurseUserId || ""} onChange={(event) => setCaseForm("assistantNurseUserId", event.target.value)}>
                   <option value="">Assign later if needed</option>
                   {nurseOptions.map((option) => (
@@ -2861,7 +2895,7 @@ function NewProcedureView({
             </div>
           </section>
 
-          {!canCreateDraft ? <p className="field-help">Complete the required patient, case type, schedule, location, and endoscopist fields to create a draft.</p> : null}
+          {!canCreateDraft ? <p className="field-help">Complete the required patient, case type, schedule, endoscopist, and facility only when there is more than one valid choice.</p> : null}
           <button className="primary-button" type="submit" disabled={caseSubmitting || !canCreateDraft}>
             <ButtonLabel icon="new-case">{caseSubmitting ? "Creating draft..." : "Create draft case"}</ButtonLabel>
           </button>

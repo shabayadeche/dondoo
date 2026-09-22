@@ -154,6 +154,10 @@ def create_start_case(
     unit_option = _find_unit_option(payload.facilityUnit)
     if payload.facilityCode and unit_option and unit_option.get("facilityCode") != payload.facilityCode:
         unit_option = None
+    inferred_facility_code = _infer_facility_code(payload.endoscopistUserId, session)
+    facility_code = unit_option.get("facilityCode") if unit_option else payload.facilityCode or inferred_facility_code
+    if not facility_code:
+        raise ValueError("Select a facility when the endoscopist can work at more than one facility.")
     draft = ClinicalDraftCasePayload(
         external_case_id=external_case_id,
         case_status="draft",
@@ -163,8 +167,8 @@ def create_start_case(
         dob_or_age=payload.dobOrAge,
         sex=payload.sex,
         patient_identity_verified=payload.patientIdentityVerified,
-        facility_unit=unit_option["label"] if unit_option else payload.facilityUnit,
-        facility_code=unit_option.get("facilityCode") if unit_option else payload.facilityCode,
+        facility_unit=unit_option["label"] if unit_option else payload.facilityUnit or "",
+        facility_code=facility_code,
         facility_unit_code=unit_option.get("code") if unit_option else None,
         endoscopist_user_id=payload.endoscopistUserId,
         endoscopist_user_ref=_lookup_user_label(payload.endoscopistUserId),
@@ -1617,6 +1621,19 @@ def _find_unit_option(code_or_label: str | None) -> dict[str, str] | None:
     for option in DEFAULT_FACILITY_UNITS:
         if option["code"].lower() == normalized or option["label"].lower() == normalized:
             return option
+    return None
+
+
+def _infer_facility_code(endoscopist_user_id: str | None, session: AuthenticatedSession | None) -> str | None:
+    if not endoscopist_user_id:
+        return None
+    for clinician in DEFAULT_CLINICIANS:
+        if clinician["role"] == "endoscopist" and clinician["userId"] == endoscopist_user_id:
+            codes = {str(code).strip() for code in clinician.get("facilityCodes", []) if str(code).strip()}
+            return next(iter(codes)) if len(codes) == 1 else None
+    if session and session.login == endoscopist_user_id:
+        codes = _session_facility_codes(session)
+        return next(iter(codes)) if len(codes) == 1 else None
     return None
 
 
