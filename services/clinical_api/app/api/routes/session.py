@@ -1,3 +1,4 @@
+import logging
 from secrets import compare_digest
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -16,6 +17,7 @@ from app.reference_data import DEFAULT_LOCAL_AUTH_USERS
 from app.schemas import AuthenticatedSessionPayload, LoginPayload
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 def _client() -> OdooBridgeClient:
@@ -44,6 +46,10 @@ def login(payload: LoginPayload, request: Request) -> AuthenticatedSessionPayloa
         try:
             odoo_session = client.authenticate_user(payload.login, payload.password)
         except OdooBridgeError as exc:
+            # Keep the client response intentionally generic, but retain the
+            # underlying bridge failure in the protected service logs so
+            # production authentication incidents can be diagnosed safely.
+            logger.warning("Odoo workspace login failed for %r: %s", payload.login, exc)
             record_failed_login_attempt(payload.login, client_host)
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Workspace login failed.") from exc
 
