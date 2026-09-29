@@ -162,11 +162,16 @@ class OdooBridgeClient:
         if not self.enabled:
             raise OdooBridgeError("Odoo bridge client is not configured.")
 
+        # Odoo controllers receive JSON-RPC parameters reliably on both the
+        # local application server and through a reverse proxy.  Retain the
+        # header for backward compatibility, but send the bridge key as the
+        # controller's explicit parameter as well.
+        request_params = {**params, "api_key": self.api_key}
         request_body = json.dumps(
             {
                 "jsonrpc": "2.0",
                 "method": "call",
-                "params": params,
+                "params": request_params,
                 "id": 1,
             }
         ).encode("utf-8")

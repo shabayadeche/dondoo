@@ -26,7 +26,9 @@ class OdooBridgePatientContractTests(unittest.TestCase):
         with patch("app.integrations.odoo_bridge.urllib_request.urlopen", return_value=response) as open_url:
             result = client.get_patient_relationship("session", "PT-001")
         self.assertEqual(result["patientIdentifier"], "PT-001")
-        self.assertIn("/phd_ass_bridge/patient_relationship", open_url.call_args.args[0].full_url)
+        request = open_url.call_args.args[0]
+        self.assertIn("/phd_ass_bridge/patient_relationship", request.full_url)
+        self.assertEqual(json.loads(request.data)["params"]["api_key"], "key")
 
     def test_patient_search_returns_bridge_results(self) -> None:
         response = Mock()
