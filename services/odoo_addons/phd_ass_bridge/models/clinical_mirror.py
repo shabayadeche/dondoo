@@ -1231,6 +1231,13 @@ class PhdAssCase(models.Model):
         ):
             raise ValidationError("Only a clinical operations admin can reopen a finalized report.")
 
+    def _ensure_return_to_draft_role(self):
+        if not (
+            self.env.user.has_group("phd_ass_bridge.group_phd_ass_operations_admin")
+            or self.env.user.has_group("phd_ass_bridge.group_phd_ass_admin")
+        ):
+            raise ValidationError("Only a clinical operations admin can return a case to draft.")
+
     def _actor_can_override_case_scope(self):
         return self.env.user.has_group("phd_ass_bridge.group_phd_ass_admin")
 
@@ -2333,8 +2340,9 @@ class PhdAssCase(models.Model):
         return True
 
     def action_generate_report_preview(self):
-        editable = self.filtered(lambda record: record.case_status != "finalized")
-        for record in editable:
+        for record in self:
+            if record.case_status == "finalized":
+                raise ValidationError("Finalized cases must be reopened before a new preview can be generated.")
             errors = record._signoff_validation_errors()
             narrative = record._generate_narrative_snapshot()
             record.with_context(phd_ass_bridge_sync=True).write(
@@ -2356,8 +2364,9 @@ class PhdAssCase(models.Model):
         return True
 
     def action_mark_ready_for_signoff(self):
-        editable = self.filtered(lambda record: record.case_status != "finalized")
-        for record in editable:
+        for record in self:
+            if record.case_status not in ("draft", "draft_reopened"):
+                raise ValidationError("Only a draft or reopened case can be marked ready for sign-off.")
             errors = record._signoff_validation_errors()
             if errors:
                 raise ValidationError(record._validation_summary_text(errors))
@@ -2419,8 +2428,12 @@ class PhdAssCase(models.Model):
         return True
 
     def action_return_to_draft(self):
-        editable = self.filtered(lambda record: record.case_status != "finalized")
-        for record in editable:
+        self._ensure_return_to_draft_role()
+        for record in self:
+            if record.case_status == "finalized":
+                raise ValidationError("Finalized cases must be reopened instead of returned to draft directly.")
+            if record.case_status not in ("ready_for_signoff", "draft_reopened"):
+                raise ValidationError("Only a ready or reopened case can be returned to draft.")
             record.sudo().with_context(phd_ass_bridge_sync=True).write(
                 {
                     "case_status": "draft",

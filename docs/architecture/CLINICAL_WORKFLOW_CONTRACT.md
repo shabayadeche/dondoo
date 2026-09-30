@@ -15,7 +15,7 @@ The clinical API is the authority for permissions and case status changes. The P
 
 | Action | Permitted role | Required source state |
 | --- | --- | --- |
-| Preview | Authenticated clinical user | Any state |
+| Preview | Authenticated clinical user | Draft, reopened draft, or ready for sign-off |
 | Mark ready for sign-off | Authenticated clinical user | Draft or reopened draft |
 | Finalize | Endoscopist | Ready for sign-off |
 | Return to draft | Operations or workspace administrator | Ready for sign-off or reopened draft |

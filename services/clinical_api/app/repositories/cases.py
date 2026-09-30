@@ -237,6 +237,12 @@ def perform_case_action(
 
         draft = _draft_from_case_record(case_record)
         _ensure_session_can_access_draft(draft, session)
+        ensure_case_action_allowed(
+            action=action,
+            status=draft.case_status,
+            role=session.primary_role if session else None,
+            reopen_reason=str(action_payload.get("reason") or ""),
+        )
         next_payload = draft.model_dump(mode="json", exclude_none=False)
         errors = _local_case_action_validation_errors(draft)
         now_iso = _format_datetime(_utcnow())

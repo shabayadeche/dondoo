@@ -6,6 +6,10 @@ from app.workflow import ensure_case_action_allowed
 
 
 class ClinicalWorkflowContractTests(unittest.TestCase):
+    def test_finalized_case_allows_only_reopen_workflow_action(self) -> None:
+        with self.assertRaisesRegex(ValueError, "must be reopened"):
+            ensure_case_action_allowed(action="preview", status="finalized", role="endoscopist")
+
     def test_only_draft_states_can_be_marked_ready(self) -> None:
         ensure_case_action_allowed(action="mark_ready_for_signoff", status="draft", role="nurse")
         ensure_case_action_allowed(action="mark_ready_for_signoff", status="draft_reopened", role="operations_admin")

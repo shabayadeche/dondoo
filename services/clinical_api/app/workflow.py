@@ -24,6 +24,8 @@ def ensure_case_action_allowed(
     controls, but it cannot grant permission or create a state transition.
     """
     if action == "preview":
+        if status == "finalized":
+            raise ValueError("Finalized cases must be reopened before a new preview can be generated.")
         return
     if action == "mark_ready_for_signoff":
         if status not in {"draft", "draft_reopened"}:
