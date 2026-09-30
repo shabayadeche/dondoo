@@ -484,7 +484,7 @@ function ButtonLabel({ icon, children }: { icon: IconName; children: ReactNode }
   return (
     <span className="button-content">
       <span className="button-icon" aria-hidden="true">
-        <AppIcon name={icon} size={16} />
+        <AppIcon name={icon} size={18} />
       </span>
       <span>{children}</span>
     </span>
@@ -2028,7 +2028,7 @@ export default function App() {
           <div className="chip-row stacked-actions">
             {activeScreen === "case-detail" ? (
               <button className="icon-button" type="button" onClick={() => handleNav("cases")} aria-label="Back to cases" title="Back to cases">
-                <AppIcon name="back" size={18} />
+                <AppIcon name="back" size={22} />
               </button>
             ) : null}
             <button className="primary-button" type="button" onClick={() => handleNav("new-procedure")}>
@@ -2431,7 +2431,7 @@ function DashboardView({
             <h2>Recently finalized</h2>
           </div>
           <button className="icon-button" type="button" onClick={onOpenCases} aria-label="Open all cases" title="Open all cases">
-            <AppIcon name="cases" size={18} />
+            <AppIcon name="cases" size={22} />
           </button>
         </div>
         <div className="list-stack">
@@ -4293,7 +4293,7 @@ function NavigationButton({
     <button className={`nav-button${active ? " is-active" : ""}`} type="button" onClick={onClick}>
       <span className="nav-main">
         <span className="nav-icon" aria-hidden="true">
-          <AppIcon name={icon} size={18} />
+          <AppIcon name={icon} size={22} />
         </span>
         <span className="nav-text">
           <strong>{label}</strong>
@@ -4321,7 +4321,7 @@ function MobileNavigationButton({
   return (
     <button className={`mobile-nav-button${active ? " is-active" : ""}`} type="button" onClick={onClick}>
       <span className="mobile-nav-icon" aria-hidden="true">
-        <AppIcon name={icon} size={18} />
+        <AppIcon name={icon} size={22} />
       </span>
       <strong>{label}</strong>
       {typeof count === "number" ? <span>{count}</span> : <span>&nbsp;</span>}
@@ -4583,7 +4583,7 @@ function FloatingHelpDock({
       ) : null}
       <button className="floating-help-button" type="button" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
         <span className="floating-help-button-icon" aria-hidden="true">
-          <AppIcon name="help" size={18} />
+          <AppIcon name="help" size={22} />
         </span>
         <span className="floating-help-button-copy">
           <strong>{label}</strong>

@@ -20,7 +20,7 @@ Do not make a clinical state change icon-only. A user must be able to understand
 
 - Use one consistent rounded-outline icon family. New icons should match the existing Dondoo stroke weight, corner treatment and optical size.
 - Use icons to reinforce a short label; they must not replace a label for a workflow decision.
-- Every icon-only control needs an `aria-label` and a `title` tooltip. The visible hit target is at least 42 by 42 pixels.
+- Every icon-only control needs an `aria-label` and a `title` tooltip. The visible hit target is at least 44 by 44 pixels; use a 22–24 pixel icon inside it.
 - Use neutral icon colour by default. Accent colour indicates the primary action; status colours must reinforce a readable status label, never be its only meaning.
 - Keep destructive and finalizing actions visibly separate from routine utilities. Do not use red simply to make a control more noticeable.
 
@@ -44,6 +44,14 @@ The supporting text should be short: “Save, preview, then sign off.” It is g
 - Avoid duplicate status cards and oversized headers. Keep the top bar to brand, useful context and essential global actions.
 - On mobile, action groups wrap and remain clear of fixed navigation or floating controls.
 
+## Clinical colour system
+
+- **Deep navy** (`#16324F`) is the trusted foundation for primary text and the application header.
+- **Clinical teal** (`#167C80`) is the primary interactive colour for actions, focus and active navigation. **Soft aqua** (`#E7F5F3`) supports selected or quiet states.
+- **Green** (`#19724A`) communicates completed or finalized status; **amber** (`#8A5A10`) communicates attention or ready-for-sign-off; **red** (`#B42318`) is reserved for errors, urgency and destructive actions.
+- **Soft white and slate neutrals** provide calm surfaces and readable secondary content.
+- Colour reinforces a readable text label and icon; it is never the sole indicator of case status. Text and controls must meet WCAG contrast requirements on their rendered surface.
+
 ## Review checklist
 
 Before merging an interface change, confirm:
@@ -53,4 +61,3 @@ Before merging an interface change, confirm:
 - Are secondary actions grouped rather than competing with the primary action?
 - Is status communicated by readable text as well as colour or icon?
 - Does the view remain usable on a narrow mobile viewport without controls being obscured?
-
