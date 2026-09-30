@@ -2496,7 +2496,7 @@ function CasesView({
 
   return (
     <section className="view-stack">
-      <div className="panel">
+      <div className="panel queue-toolbar">
         <div className="panel-header">
           <div>
             <p className="eyebrow">Cases</p>
@@ -2506,13 +2506,16 @@ function CasesView({
             <ButtonLabel icon="new-case">Start case</ButtonLabel>
           </button>
         </div>
-        <input
-          className="search-input"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search patient identifier, clinician, or procedure"
-        />
-        <div className="filter-row" aria-label="Case filters">
+        <div className="queue-toolbar-controls">
+          <input
+            className="search-input"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search patient identifier, clinician, or procedure"
+          />
+          <span className="queue-result-count" role="status">{visibleCases.length} shown</span>
+        </div>
+        <div className="filter-row queue-filter-row" aria-label="Case filters">
           <label className="compact-field">Status
             <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
               <option value="all">All statuses</option><option value="draft">Draft</option><option value="draft_reopened">Reopened</option><option value="ready_for_signoff">Ready for sign-off</option><option value="finalized">Finalized</option>
@@ -2611,19 +2614,22 @@ function TasksView({
 
   return (
     <section className="view-stack">
-      <div className="panel">
+      <div className="panel queue-toolbar">
         <div className="panel-header">
           <div>
             <p className="eyebrow">Tasks</p>
             <h2>Follow-up work</h2>
           </div>
         </div>
-        <input
-          className="search-input"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search owner, task type, case ID, or status"
-        />
+        <div className="queue-toolbar-controls">
+          <input
+            className="search-input"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search owner, task type, case ID, or status"
+          />
+          <span className="queue-result-count" role="status">{tasks.length} shown</span>
+        </div>
       </div>
 
       {tasks.length ? (
@@ -2718,9 +2724,15 @@ function NewProcedureView({
     resolvedFacilityCode &&
     caseForm.endoscopistUserId
   );
+  const startSteps = [
+    { label: "Patient", complete: Boolean(caseForm.patientIdentifier.trim()) },
+    { label: "Case type", complete: Boolean(caseForm.procedureType) },
+    { label: "Schedule", complete: Boolean(caseForm.procedureDatetime && resolvedFacilityCode) },
+    { label: "Team", complete: Boolean(caseForm.endoscopistUserId) }
+  ];
   return (
     <section className="view-stack">
-        <article className="panel">
+        <article className="panel case-start-panel">
         <div className="panel-header">
           <div>
             <p className="eyebrow">Draft starter</p>
@@ -2729,7 +2741,16 @@ function NewProcedureView({
           <span className={`status-chip tone-${caseForm.procedureType ? "accent" : "warning"}`}>{caseTypeLabel}</span>
         </div>
 
-        <form className="case-form" onSubmit={(event) => void onSubmit(event)}>
+        <ol className="case-start-progress" aria-label="Case setup progress">
+          {startSteps.map((step, index) => (
+            <li key={step.label} className={step.complete ? "is-complete" : ""}>
+              <span>{step.complete ? "✓" : index + 1}</span>
+              <strong>{step.label}</strong>
+            </li>
+          ))}
+        </ol>
+
+        <form className="case-form case-start-form" onSubmit={(event) => void onSubmit(event)}>
           <section className="form-section">
             <div className="section-heading">
               <div>
@@ -2895,10 +2916,14 @@ function NewProcedureView({
             </div>
           </section>
 
-          {!canCreateDraft ? <p className="field-help">Complete the required patient, case type, schedule, endoscopist, and facility only when there is more than one valid choice.</p> : null}
-          <button className="primary-button" type="submit" disabled={caseSubmitting || !canCreateDraft}>
-            <ButtonLabel icon="new-case">{caseSubmitting ? "Creating draft..." : "Create draft case"}</ButtonLabel>
-          </button>
+          <div className="case-start-actions">
+            <p className="field-help" aria-live="polite">
+              {canCreateDraft ? "Everything needed is in place. Create the draft to begin structured reporting." : "Complete the highlighted setup steps to create a draft."}
+            </p>
+            <button className="primary-button" type="submit" disabled={caseSubmitting || !canCreateDraft}>
+              <ButtonLabel icon="new-case">{caseSubmitting ? "Creating draft..." : "Create draft case"}</ButtonLabel>
+            </button>
+          </div>
         </form>
         </article>
     </section>

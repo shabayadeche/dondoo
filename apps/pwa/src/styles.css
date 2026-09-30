@@ -1763,49 +1763,217 @@ body {
   }
 }
 
-/* Odoo-inspired compact mode: clinical content stays prominent while
-   decorative chrome and repeated explanatory copy recede. */
+/* Product-quality workspace layer: calm enough for clinical work, with the
+   visual clarity and responsive feedback users expect from mature SaaS apps. */
+.workspace-shell {
+  gap: 24px;
+  padding-top: 24px;
+}
+
+.workspace-header {
+  padding: 4px 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+
 .panel,
 .hero-panel,
 .result-card,
 .rail-card,
 .benefit-card,
 .login-panel {
-  border-radius: 8px;
-  box-shadow: none;
-}
-
-.workspace-shell {
-  gap: 14px;
-  padding-top: 16px;
-}
-
-.workspace-header {
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.surface-section-summary,
-.queue-panel-summary {
-  display: none;
-}
-
-.surface-section,
-.queue-panel {
-  gap: 10px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
 .panel,
 .hero-panel,
 .result-card {
-  padding: 16px;
+  padding: 22px;
 }
 
-.panel-header {
-  gap: 10px;
+.surface-section-summary,
+.queue-panel-summary {
+  display: block;
 }
 
-.field-grid,
-.field-grid-three {
-  gap: 10px;
+.result-card,
+.clinical-row-button,
+.patient-search-option,
+.nav-button,
+.mobile-nav-button {
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.result-card:hover,
+.clinical-row-button:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  box-shadow: 0 10px 22px rgba(27, 34, 43, 0.07);
+}
+
+.clinical-row-button:hover,
+.patient-search-option:hover,
+.nav-button:hover {
+  transform: translateY(-1px);
+}
+
+.queue-toolbar {
+  display: grid;
+  gap: 18px;
+  background: linear-gradient(135deg, rgba(255, 253, 248, 0.98), rgba(222, 236, 232, 0.48));
+}
+
+.queue-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.queue-toolbar-controls .search-input {
+  max-width: 560px;
+}
+
+.queue-result-count {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border: 1px solid rgba(47, 123, 116, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.72);
+  color: var(--accent-deep);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.queue-filter-row {
+  padding-top: 4px;
+  border-top: 1px solid rgba(38, 47, 59, 0.07);
+}
+
+.case-start-panel {
+  max-width: 980px;
+}
+
+.case-start-progress {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 2px 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.case-start-progress li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.case-start-progress span {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-soft-strong);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.case-start-progress strong {
+  overflow: hidden;
+  font-size: 0.86rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.case-start-progress .is-complete {
+  border-color: rgba(47, 109, 68, 0.22);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.case-start-progress .is-complete span {
+  background: var(--success);
+  color: #fff;
+}
+
+.case-start-form .form-section {
+  padding: 18px;
+  border: 1px solid rgba(38, 47, 59, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 253, 248, 0.64);
+}
+
+.case-start-actions {
+  position: sticky;
+  bottom: 18px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(47, 123, 116, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: 0 12px 28px rgba(27, 34, 43, 0.11);
+  backdrop-filter: blur(14px);
+}
+
+.case-start-actions .field-help {
+  margin: 0;
+}
+
+.case-start-actions .primary-button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 720px) {
+  .workspace-shell {
+    gap: 18px;
+    padding-top: 16px;
+  }
+
+  .panel,
+  .hero-panel,
+  .result-card {
+    padding: 18px;
+  }
+
+  .queue-toolbar-controls,
+  .case-start-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .queue-toolbar-controls .search-input {
+    max-width: none;
+  }
+
+  .queue-result-count {
+    align-self: flex-start;
+  }
+
+  .case-start-progress {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .case-start-form .form-section {
+    padding: 14px;
+  }
+
+  .case-start-actions {
+    bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .case-start-actions .primary-button {
+    width: 100%;
+  }
 }
