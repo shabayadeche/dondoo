@@ -243,11 +243,6 @@ const screenContent: Record<ScreenKey, { eyebrow: string; title: string; summary
     summary: "Complete the structured procedure record, maintain follow-up tasks, and move the case through sign-off."
   }
 };
-const startCaseChecks: HelpDockItem[] = [
-  { label: "Use the patient identifier exactly as it should appear on the final report." },
-  { label: "Confirm the room and time before the team starts capturing procedure findings." },
-  { label: "Assign the performing endoscopist up front so sign-off and audit trails stay accurate." }
-];
 const caseAuthoringChecks: HelpDockItem[] = [
   { label: "Save the draft after material edits before changing workflow status." },
   { label: "Generate a preview before marking the case ready for sign-off." },
@@ -2211,34 +2206,10 @@ export default function App() {
       </div>
 
       {activeScreen === "dashboard" ? (
-        <FloatingHelpDock
-          label="Dashboard help"
-          title="Dashboard quick guide"
-          summary="Use the dashboard to see what needs attention now, then open Cases or Tasks for the full work queue."
-          sections={[
-            {
-              eyebrow: "Getting started",
-              title: "Start a clean case",
-              icon: "checklist",
-              items: startCaseChecks
-            },
-            {
-              eyebrow: "At a glance",
-              title: "What the dashboard shows",
-              icon: "dashboard",
-              items: [
-                { label: "Ready reports", detail: "Cases waiting for endoscopist review and sign-off." },
-                { label: "Open follow-up", detail: "Tasks that still need an owner or completion." },
-                { label: "Recently finalized", detail: "Completed reports available for past-record review." }
-              ]
-            },
-            {
-              eyebrow: "Next step",
-              title: "Keep work moving",
-              icon: "checklist",
-              items: [{ label: "Open a card to continue, or use Start case for a new draft." }]
-            }
-          ]}
+        <DashboardQuickHelp
+          onStartCase={() => handleNav("new-procedure")}
+          onOpenCases={() => handleNav("cases")}
+          onOpenTasks={() => handleNav("tasks")}
         />
       ) : null}
 
@@ -4589,6 +4560,61 @@ function FloatingHelpDock({
           <strong>{label}</strong>
           <small>Workflow and checks</small>
         </span>
+      </button>
+    </div>
+  );
+}
+
+function DashboardQuickHelp({
+  onStartCase,
+  onOpenCases,
+  onOpenTasks
+}: {
+  onStartCase: () => void;
+  onOpenCases: () => void;
+  onOpenTasks: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const options: Array<{ icon: IconName; label: string; detail: string; onClick: () => void }> = [
+    { icon: "new-case", label: "Start a case", detail: "Create a new draft.", onClick: onStartCase },
+    { icon: "cases", label: "Find a case", detail: "Open the live case queue.", onClick: onOpenCases },
+    { icon: "tasks", label: "Review tasks", detail: "See work that still needs attention.", onClick: onOpenTasks }
+  ];
+
+  return (
+    <div className={`dashboard-quick-help${open ? " is-open" : ""}`}>
+      {open ? (
+        <section className="dashboard-quick-help-panel" role="dialog" aria-label="Dashboard help">
+          <div className="dashboard-quick-help-header">
+            <div>
+              <p className="eyebrow">Quick help</p>
+              <h2>What do you need to do?</h2>
+            </div>
+            <button className="help-close-button" type="button" onClick={() => setOpen(false)} aria-label="Close dashboard help">
+              <AppIcon name="close" size={18} />
+            </button>
+          </div>
+          <div className="dashboard-quick-help-actions">
+            {options.map((option) => (
+              <button
+                key={option.label}
+                className="dashboard-quick-help-action"
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  option.onClick();
+                }}
+              >
+                <span className="dashboard-quick-help-icon" aria-hidden="true"><AppIcon name={option.icon} size={22} /></span>
+                <span><strong>{option.label}</strong><small>{option.detail}</small></span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+      <button className="dashboard-help-button" type="button" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+        <AppIcon name="help" size={20} />
+        <span>Need help?</span>
       </button>
     </div>
   );

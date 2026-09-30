@@ -44,6 +44,12 @@ The supporting text should be short: “Save, preview, then sign off.” It is g
 - Avoid duplicate status cards and oversized headers. Keep the top bar to brand, useful context and essential global actions.
 - On mobile, action groups wrap and remain clear of fixed navigation or floating controls.
 
+## Help
+
+- The dashboard uses a compact **Need help?** control, not a long generic guide. It routes directly to starting a case, finding a case or reviewing tasks.
+- Put short guidance next to complex form fields and status transitions, where the decision is made.
+- Do not make a chatbot the primary source of workflow guidance. Any future assistant must be optional and must not replace explicit clinical workflow controls.
+
 ## Clinical colour system
 
 - **Deep navy** (`#16324F`) is the trusted foundation for primary text and the application header.

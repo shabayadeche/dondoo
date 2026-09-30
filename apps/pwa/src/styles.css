@@ -1434,6 +1434,99 @@ body {
   justify-items: end;
 }
 
+.dashboard-quick-help {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
+.dashboard-help-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-solid);
+  color: var(--ink);
+  box-shadow: 0 12px 28px rgba(22, 50, 79, 0.12);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.dashboard-help-button:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.dashboard-quick-help-panel {
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-solid);
+  box-shadow: 0 20px 48px rgba(22, 50, 79, 0.16);
+}
+
+.dashboard-quick-help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.dashboard-quick-help-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.dashboard-quick-help-action {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-quick-help-action:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: var(--accent-soft);
+}
+
+.dashboard-quick-help-action > span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.dashboard-quick-help-action small {
+  color: var(--muted);
+}
+
+.dashboard-quick-help-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--surface-solid);
+  color: var(--accent-deep);
+}
+
 .case-phase-nav {
   position: sticky;
   top: 12px;
@@ -1802,8 +1895,16 @@ body {
     justify-items: stretch;
   }
 
+  .dashboard-quick-help {
+    position: static;
+    margin-top: 20px;
+    justify-items: stretch;
+  }
+
   .floating-help-button,
-  .floating-help-panel {
+  .floating-help-panel,
+  .dashboard-help-button,
+  .dashboard-quick-help-panel {
     width: 100%;
   }
 }
