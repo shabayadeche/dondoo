@@ -78,7 +78,8 @@ type IconName =
   | "edit"
   | "image"
   | "upload"
-  | "trash";
+  | "trash"
+  | "more";
 type HelpDockItem = { label: string; detail?: string };
 type HelpDockSection = {
   eyebrow: string;
@@ -433,6 +434,14 @@ function AppIcon({ name, size = 18 }: { name: IconName; size?: number }) {
           <path d="M13.5 11v5" />
         </svg>
       );
+    case "more":
+      return (
+        <svg {...commonProps}>
+          <circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" />
+          <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+          <circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" />
+        </svg>
+      );
     case "checklist":
       return (
         <svg {...commonProps}>
@@ -479,6 +488,17 @@ function ButtonLabel({ icon, children }: { icon: IconName; children: ReactNode }
       </span>
       <span>{children}</span>
     </span>
+  );
+}
+
+function ActionMenu({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="action-menu">
+      <summary aria-label={label} title={label}>
+        <AppIcon name="more" size={20} />
+      </summary>
+      <div className="action-menu-popover">{children}</div>
+    </details>
   );
 }
 
@@ -3982,14 +4002,21 @@ function CaseDetailView({
             </div>
           </div>
           <p className="muted-text control-deck-note">
-            Save when needed, preview before sign-off, and only finalize once the record is complete enough to stand on its own.
+            Save, preview, then sign off.
           </p>
           <div className="detail-actions">
             <button className="primary-button" type="button" onClick={onSaveDraft} disabled={!editable || caseSaving}>
               <ButtonLabel icon="save">{caseSaving ? "Saving draft..." : "Save draft"}</ButtonLabel>
             </button>
-            <button className="secondary-button" type="button" onClick={() => onRunAction("preview")} disabled={!editable || caseActionLoading === "preview"}>
-              <ButtonLabel icon="preview">{caseActionLoading === "preview" ? "Generating preview..." : "Generate preview"}</ButtonLabel>
+            <button
+              className="icon-button"
+              type="button"
+              onClick={() => onRunAction("preview")}
+              disabled={!editable || caseActionLoading === "preview"}
+              aria-label={caseActionLoading === "preview" ? "Generating preview" : "Generate preview"}
+              title={caseActionLoading === "preview" ? "Generating preview" : "Generate preview"}
+            >
+              <AppIcon name="preview" size={20} />
             </button>
             <button
               className="secondary-button"
@@ -4020,14 +4047,16 @@ function CaseDetailView({
                 </button>
               </>
             ) : null}
-            {hasFinalizedPdf ? (
-              <button className="secondary-button" type="button" onClick={onOpenCasePdf}>
-                <ButtonLabel icon="pdf">Open finalized PDF</ButtonLabel>
+            <ActionMenu label="More case actions">
+              {hasFinalizedPdf ? (
+                <button className="secondary-button" type="button" onClick={onOpenCasePdf}>
+                  <ButtonLabel icon="pdf">Open finalized PDF</ButtonLabel>
+                </button>
+              ) : null}
+              <button className="secondary-button" type="button" onClick={onBackToCases}>
+                <ButtonLabel icon="back">Back to list</ButtonLabel>
               </button>
-            ) : null}
-            <button className="secondary-button" type="button" onClick={onBackToCases}>
-              <ButtonLabel icon="back">Back to list</ButtonLabel>
-            </button>
+            </ActionMenu>
           </div>
         </article>
 
