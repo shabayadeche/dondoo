@@ -64,7 +64,7 @@ Recommended production PWA env:
 
 ### GitHub Actions deployment
 
-The repository workflow at `.github/workflows/ci-cd.yml` runs PWA type checks and builds plus the clinical API acceptance suite for pull requests and pushes to `develop` or `main`. A successful push to `main` deploys through AWS Systems Manager, builds the exact Git commit on the instance, publishes it as an immutable release, and atomically repoints `/srv/phd-ass/pwa/current`.
+The repository workflow at `.github/workflows/ci-cd.yml` runs PWA type checks and builds plus the clinical API acceptance suite for pull requests and pushes to `develop` or `main`. A successful push to `main` deploys through AWS Systems Manager, builds the exact Git commit on the instance, publishes it as an immutable release, and atomically repoints `/srv/phd-ass/pwa/current`. It also restarts the clinical API and, when exactly one Odoo systemd service is present and its configuration explicitly includes `/srv/phd-ass/current/services/odoo_addons`, restarts Odoo so code-only bridge safeguards take effect. It fails safely if Odoo is present but that add-ons contract cannot be verified.
 
 Create a GitHub Environment named `production`, protect it with the required reviewer(s), then configure these environment variables:
 

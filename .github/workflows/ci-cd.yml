@@ -155,6 +155,25 @@ jobs:
             sleep 5
           done
 
+          # Keep the optional Odoo bridge on the same revision when it is
+          # installed on this managed host. A code-only bridge change needs a
+          # process restart (not a database/module upgrade), but never guess
+          # which service or add-ons path is safe to restart.
+          mapfile -t odoo_units < <(systemctl list-unit-files --type=service --no-legend 2>/dev/null | awk '$1 ~ /(^odoo|[-_.]odoo).*\\.service$/ {print $1}')
+          if [ "${#odoo_units[@]}" -eq 0 ]; then
+            echo "No Odoo systemd service found on this host; skipping Odoo bridge restart."
+          elif [ "${#odoo_units[@]}" -ne 1 ]; then
+            echo "Expected one Odoo service, found: ${odoo_units[*]}" >&2
+            exit 1
+          elif ! grep -RqsF "${repository_root}/services/odoo_addons" /etc/odoo.conf /etc/odoo 2>/dev/null; then
+            echo "${odoo_units[0]} is present but its configured add-ons path does not include ${repository_root}/services/odoo_addons." >&2
+            exit 1
+          else
+            systemctl restart "${odoo_units[0]}"
+            systemctl is-active --quiet "${odoo_units[0]}"
+            echo "Restarted Odoo bridge service ${odoo_units[0]}."
+          fi
+
           npm ci
           npm run build:pwa
 
