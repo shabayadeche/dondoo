@@ -748,21 +748,6 @@ function getTaskStatusTone(status: FollowUpTask["status"]): StatusTone {
   }
 }
 
-function getHealthTone(status: string): StatusTone {
-  return status === "ok" ? "success" : "warning";
-}
-
-function getConnectionLabel(status: string): string {
-  switch (status) {
-    case "ok":
-      return "Connected";
-    case "offline":
-      return "Offline";
-    default:
-      return "Needs attention";
-  }
-}
-
 function getErrorPresentation(
   message: string,
   screen: ScreenKey
@@ -1002,7 +987,6 @@ export default function App() {
   const todayLabel = useMemo(() => dateLabelFormatter.format(new Date()), []);
 
   const meta = bundle?.meta ?? defaultMeta;
-  const health = bundle?.health ?? { status: error ? "error" : "offline", service: "clinical-api" };
   const lookups = bundle?.lookups ?? defaultLookups;
   const cases = bundle?.cases ?? [];
   const tasks = bundle?.tasks ?? [];
@@ -1049,9 +1033,7 @@ export default function App() {
     : activeScreen === "dashboard"
       ? { ...screenContent.dashboard, summary: roleWorkspaceCopy.headerSummary }
       : screenContent[activeScreen];
-  const showWorkspaceStatusNote = activeScreen !== "dashboard";
   const shellWarningMessage = (bundle?.warnings ?? []).join(" ");
-  const connectionLabel = getConnectionLabel(health.status);
   const errorPresentation = error ? getErrorPresentation(error, activeScreen) : null;
   const caseWorkflowSteps = caseDetail ? meta.workflowStepsByProcedure[caseDetail.procedure_type] ?? meta.workflowSteps : meta.workflowSteps;
 
@@ -2016,35 +1998,13 @@ export default function App() {
   return (
     <main className="workspace-shell">
       <header className="workspace-header">
-        <div className="header-copy">
-          <div className="brand-lockup">
-            <div className="brand-mark" aria-hidden="true">
-              <img className="brand-logo" src="/brand/dondoo-mark.svg" alt="" />
-            </div>
-            <div>
-              <p className="eyebrow">Dondoo / {screenCopy.eyebrow}</p>
-              <h1>{screenCopy.title}</h1>
-            </div>
-          </div>
-          {activeScreen !== "dashboard" ? <p className="support-copy">{screenCopy.summary}</p> : null}
+        <div className="app-bar-brand">
+          <img className="app-bar-logo" src="/brand/dondoo-logo.svg" alt="Dondoo" />
+          <span className="app-bar-divider" aria-hidden="true" />
+          <span className="app-bar-context">{screenCopy.eyebrow}</span>
         </div>
 
         <div className="header-actions">
-          <article className="header-note-card workspace-status-card">
-            <div className="workspace-status-heading">
-              <div className="workspace-status-copy">
-                <p className="eyebrow">Shift status</p>
-                <strong>{todayLabel}</strong>
-                {showWorkspaceStatusNote ? <p className="muted-text workspace-status-note">{roleWorkspaceCopy.headerNote}</p> : null}
-              </div>
-              <span className={`status-chip tone-${getHealthTone(health.status)}`}>{connectionLabel}</span>
-            </div>
-            <div className="chip-row workspace-status-metrics">
-              <span className="status-chip tone-neutral">{formatLabel(session.primaryRole)}</span>
-              <span className="status-chip tone-neutral">{finalizedTodayCount} finalized today</span>
-              {loading ? <span className="status-chip tone-accent">Refreshing</span> : null}
-            </div>
-          </article>
           <div className="chip-row stacked-actions">
             {activeScreen === "case-detail" ? (
               <button className="secondary-button" type="button" onClick={() => handleNav("cases")}>

@@ -348,33 +348,48 @@ body {
 .workspace-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  padding-bottom: 8px;
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
-.header-copy {
-  max-width: 760px;
+.app-bar-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 14px;
 }
 
-.header-copy h1 {
-  font-size: clamp(2rem, 3vw, 2.8rem);
+.app-bar-logo {
+  display: block;
+  width: 118px;
+  height: auto;
+}
+
+.app-bar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-strong);
+}
+
+.app-bar-context {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header-actions {
-  display: grid;
-  gap: 14px;
-  justify-items: end;
-  min-width: 320px;
-}
-
-.header-note-card {
-  width: min(420px, 100%);
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 .stacked-actions {
-  width: 100%;
   justify-content: flex-end;
 }
 
@@ -1663,16 +1678,11 @@ body {
   }
 
   .workspace-header {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .header-actions {
-    width: 100%;
-    justify-items: start;
-  }
-
-  .header-note-card {
-    width: 100%;
+    width: auto;
   }
 
   .mobile-nav {
@@ -1736,7 +1746,6 @@ body {
   .surface-section-header,
   .title-with-icon,
   .queue-title-row,
-  .workspace-status-heading,
   .banner {
     flex-direction: column;
   }
@@ -1746,9 +1755,31 @@ body {
   }
 
   .hero-actions,
-  .chip-row,
-  .stacked-actions {
+  .chip-row:not(.stacked-actions) {
     flex-direction: column;
+  }
+
+  .workspace-header {
+    min-height: 48px;
+    padding-bottom: 10px;
+  }
+
+  .app-bar-logo {
+    width: 98px;
+  }
+
+  .app-bar-divider {
+    height: 20px;
+  }
+
+  .app-bar-context {
+    font-size: 0.8rem;
+  }
+
+  .header-actions .primary-button,
+  .header-actions .secondary-button {
+    min-width: 42px;
+    padding: 11px 13px;
   }
 
   .dashboard-queue-strip,
