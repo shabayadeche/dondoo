@@ -2007,8 +2007,8 @@ export default function App() {
         <div className="header-actions">
           <div className="chip-row stacked-actions">
             {activeScreen === "case-detail" ? (
-              <button className="secondary-button" type="button" onClick={() => handleNav("cases")}>
-                <ButtonLabel icon="back">Back to cases</ButtonLabel>
+              <button className="icon-button" type="button" onClick={() => handleNav("cases")} aria-label="Back to cases" title="Back to cases">
+                <AppIcon name="back" size={18} />
               </button>
             ) : null}
             <button className="primary-button" type="button" onClick={() => handleNav("new-procedure")}>
@@ -2281,12 +2281,12 @@ function DashboardView({
     drafts: {
       eyebrow: "Drafts",
       title: "Still in progress",
-      summary: "Cases that still need authoring, corrections, or another review pass.",
+      summary: "",
       icon: "draft",
       count: draftCases.length,
       tone: draftCases.length ? "accent" : "neutral",
       emptyTitle: "Draft queue is clear",
-      emptyMessage: "New or reopened cases will appear here when active reporting resumes.",
+      emptyMessage: "No active cases.",
       actionLabel: "Open cases",
       actionIcon: "cases",
       onAction: onOpenCases,
@@ -2305,12 +2305,12 @@ function DashboardView({
     ready: {
       eyebrow: "Ready",
       title: "Waiting for sign-off",
-      summary: "Completed reports that can move straight into clinical sign-off.",
+      summary: "",
       icon: "ready",
       count: readyCases.length,
       tone: readyCases.length ? "warning" : "neutral",
       emptyTitle: "Sign-off queue is clear",
-      emptyMessage: "Cases ready for sign-off will appear here as soon as drafting is complete.",
+      emptyMessage: "No reports ready for sign-off.",
       actionLabel: "Open cases",
       actionIcon: "cases",
       onAction: onOpenCases,
@@ -2329,12 +2329,12 @@ function DashboardView({
     tasks: {
       eyebrow: "Tasks",
       title: "Still open",
-      summary: "Follow-up actions that still need a callback, pathology review, or closure.",
+      summary: "",
       icon: "tasks",
       count: actionableTaskCount,
       tone: actionableTaskCount ? "critical" : "success",
       emptyTitle: "Follow-up queue is clear",
-      emptyMessage: "Outstanding callbacks and surveillance tasks will appear here when they need action.",
+      emptyMessage: "No open follow-up.",
       actionLabel: "Open tasks",
       actionIcon: "tasks",
       onAction: onOpenTasks,
@@ -2410,15 +2410,15 @@ function DashboardView({
             <p className="eyebrow">Completed work</p>
             <h2>Recently finalized</h2>
           </div>
-          <button className="secondary-button" type="button" onClick={onOpenCases}>
-            <ButtonLabel icon="cases">All cases</ButtonLabel>
+          <button className="icon-button" type="button" onClick={onOpenCases} aria-label="Open all cases" title="Open all cases">
+            <AppIcon name="cases" size={18} />
           </button>
         </div>
         <div className="list-stack">
           {recentFinalized.length ? (
             recentFinalized.map((entry) => <CaseCard key={entry.id} entry={entry} compact />)
           ) : (
-            <EmptyStateCard title="No finalized cases yet" body="Completed reports will appear here after sign-off." compact />
+            <EmptyStateCard title="No finalized cases yet" body="Finalized reports appear here." compact />
           )}
         </div>
       </section>
@@ -2494,7 +2494,7 @@ function CasesView({
           <SurfaceSection
             eyebrow="Ready"
             title="Waiting for sign-off"
-            summary="Reports that can now move to the endoscopist for review and final sign-off."
+            summary=""
             icon="ready"
             count={readyCases.length}
             tone={readyCases.length ? "warning" : "neutral"}
@@ -2505,7 +2505,7 @@ function CasesView({
           <SurfaceSection
             eyebrow="In progress"
             title="Drafts and reopened cases"
-            summary="Cases that still need procedure details, corrections, or another review pass."
+            summary=""
             icon="draft"
             count={workingCases.length}
             tone={workingCases.length ? "accent" : "neutral"}
@@ -2516,7 +2516,7 @@ function CasesView({
           <SurfaceSection
             eyebrow="Completed"
             title="Finalized reports"
-            summary="Closed reports stay here for review without getting mixed into current work."
+            summary=""
             icon="finalized"
             count={finalizedCases.length}
             tone={finalizedCases.length ? "success" : "neutral"}
@@ -2527,7 +2527,7 @@ function CasesView({
           <SurfaceSection
             eyebrow="Patients"
             title="My patients"
-            summary="Patients represented in your accessible cases. Open the most recent case to continue review."
+            summary=""
             icon="cases"
             count={patientGroups.length}
             tone={patientGroups.length ? "accent" : "neutral"}
@@ -2551,7 +2551,7 @@ function CasesView({
           </SurfaceSection>
         </div>
       ) : (
-        <EmptyStateCard title="No matching cases" body="Try a broader search or start a new procedure to open the next draft." />
+        <EmptyStateCard title="No matching cases" body="Change filters or start a case." />
       )}
     </section>
   );
@@ -2597,7 +2597,7 @@ function TasksView({
           <SurfaceSection
             eyebrow="Overdue"
             title="Needs attention"
-            summary="These tasks need action soon so they do not drift further behind."
+            summary=""
             icon="tasks"
             count={overdueTasks.length}
             tone={overdueTasks.length ? "critical" : "neutral"}
@@ -2608,7 +2608,7 @@ function TasksView({
           <SurfaceSection
             eyebrow="Open"
             title="Still in progress"
-            summary="Follow-up that is active, assigned, and not currently overdue."
+            summary=""
             icon="checklist"
             count={activeTasks.length}
             tone={activeTasks.length ? "accent" : "neutral"}
@@ -2619,7 +2619,7 @@ function TasksView({
           <SurfaceSection
             eyebrow="Closed"
             title="Finished work"
-            summary="Resolved tasks remain visible here without crowding the active list."
+            summary=""
             icon="finalized"
             count={closedTasks.length}
             tone={closedTasks.length ? "success" : "neutral"}
@@ -2630,7 +2630,7 @@ function TasksView({
       ) : (
         <EmptyStateCard
           title="No matching tasks"
-          body="Follow-up tasks will appear here once pathology, communication, or surveillance work is created."
+          body="Follow-up tasks appear here."
         />
       )}
     </section>
@@ -2801,7 +2801,7 @@ function NewProcedureView({
                   ))}
                 </select>
               </label>
-              <p className="field-help">Choose a case type to set up the correct clinical record. Procedure guidance is available while documenting the case.</p>
+              <p className="field-help">Select a procedure to load its clinical fields.</p>
             </div>
           </section>
 
