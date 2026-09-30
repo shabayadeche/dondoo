@@ -88,7 +88,12 @@ class OdooBridgeClient:
             raise OdooBridgeError("Odoo authentication returned invalid JSON.") from exc
 
         if decoded.get("error"):
-            raise OdooBridgeError("Odoo authentication failed.")
+            error_payload = decoded["error"]
+            message = error_payload.get("message") if isinstance(error_payload, dict) else str(error_payload)
+            detail = error_payload.get("data") if isinstance(error_payload, dict) else None
+            if isinstance(detail, dict):
+                message = detail.get("message") or message
+            raise OdooBridgeError(f"Odoo authentication failed: {message}")
 
         session_id = next((item.value for item in jar if item.name == "session_id"), "")
         if not session_id:
