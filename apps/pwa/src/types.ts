@@ -27,6 +27,14 @@ export type MetaPayload = {
   };
 };
 
+export type RoleDashboardPayload = {
+  role: WorkspaceRole;
+  headline: string;
+  primaryLane: "drafts" | "ready" | "tasks";
+  lanes: Array<{ key: "drafts" | "ready" | "tasks"; label: string; count: number }>;
+  finalizedToday: number;
+};
+
 export type HealthPayload = {
   status: string;
   service: string;
@@ -351,5 +359,6 @@ export type ApiBundle = {
   cases: CaseSummary[];
   tasks: FollowUpTask[];
   lookups: ClinicalLookupsPayload;
+  dashboard?: RoleDashboardPayload | undefined;
   warnings?: string[];
 };

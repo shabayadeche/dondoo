@@ -117,6 +117,20 @@ class DashboardSnapshot(BaseModel):
     finalizedToday: int
 
 
+class DashboardLanePayload(BaseModel):
+    key: Literal["drafts", "ready", "tasks"]
+    label: str
+    count: int
+
+
+class RoleDashboardPayload(BaseModel):
+    role: WorkspaceRole
+    headline: str
+    primaryLane: Literal["drafts", "ready", "tasks"]
+    lanes: list[DashboardLanePayload]
+    finalizedToday: int
+
+
 class LoginPayload(BaseModel):
     login: str = Field(min_length=1)
     password: str = Field(min_length=1)

@@ -16,6 +16,7 @@ import type {
   HealthPayload,
   LoginPayload,
   MetaPayload,
+  RoleDashboardPayload,
   StartCasePayload,
   StartCaseResponse
 } from "./types";
@@ -210,15 +211,16 @@ export function logoutClinician(): Promise<{ status: string }> {
 }
 
 export async function fetchShellData(): Promise<ApiBundle> {
-  const [healthResult, metaResult, casesResult, tasksResult, lookupsResult] = await Promise.allSettled([
+  const [healthResult, metaResult, casesResult, tasksResult, lookupsResult, dashboardResult] = await Promise.allSettled([
     requestJson<HealthPayload>("/health"),
     requestJson<MetaPayload>("/api/meta"),
     requestJson<CaseSummary[]>("/api/cases"),
     requestJson<FollowUpTask[]>("/api/tasks"),
-    requestJson<ClinicalLookupsPayload>("/api/lookups")
+    requestJson<ClinicalLookupsPayload>("/api/lookups"),
+    requestJson<RoleDashboardPayload>("/api/dashboard")
   ]);
 
-  const authFailure = [healthResult, metaResult, casesResult, tasksResult, lookupsResult].find(
+  const authFailure = [healthResult, metaResult, casesResult, tasksResult, lookupsResult, dashboardResult].find(
     (result): result is PromiseRejectedResult =>
       result.status === "rejected" && result.reason instanceof ApiRequestError && result.reason.status === 401
   );
@@ -242,6 +244,7 @@ export async function fetchShellData(): Promise<ApiBundle> {
   const lookups = lookupsResult.status === "fulfilled"
     ? lookupsResult.value
     : defaultLookups;
+  const dashboard = dashboardResult.status === "fulfilled" ? dashboardResult.value : undefined;
 
   if (metaResult.status === "rejected") {
     addShellWarning(warnings, "Workflow defaults are in use while the live configuration reloads.");
@@ -252,8 +255,11 @@ export async function fetchShellData(): Promise<ApiBundle> {
   if (lookupsResult.status === "rejected") {
     addShellWarning(warnings, "Reference lists are unavailable. Starting a new case may be limited until the service recovers.");
   }
+  if (dashboardResult.status === "rejected") {
+    addShellWarning(warnings, "Role priorities are temporarily using the local workspace fallback.");
+  }
 
-  return { health, meta, cases, tasks, lookups, warnings };
+  return { health, meta, cases, tasks, lookups, dashboard, warnings };
 }
 
 export function submitStartCase(payload: StartCasePayload): Promise<StartCaseResponse> {

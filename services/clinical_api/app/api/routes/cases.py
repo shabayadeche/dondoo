@@ -17,6 +17,7 @@ from app.repositories.cases import (
     get_case_history,
     get_case_image,
     get_case_pdf,
+    get_role_dashboard,
     list_cases,
     list_tasks,
     perform_case_action,
@@ -39,6 +40,7 @@ from app.schemas import (
     StartCasePayload,
     PatientRelationshipSuggestion,
     PatientLookupOption,
+    RoleDashboardPayload,
 )
 
 router = APIRouter()
@@ -77,6 +79,14 @@ def _binary_attachment_response(payload: bytes, filename: str, media_type: str) 
 def get_cases(session=Depends(get_authenticated_session)) -> list[CaseSummary]:
     try:
         return list_cases(session=session)
+    except OdooBridgeError as exc:
+        _raise_bridge_http_error(exc)
+
+
+@router.get("/dashboard", response_model=RoleDashboardPayload)
+def get_dashboard(session=Depends(get_authenticated_session)) -> RoleDashboardPayload:
+    try:
+        return get_role_dashboard(session=session)
     except OdooBridgeError as exc:
         _raise_bridge_http_error(exc)
 

@@ -29,6 +29,7 @@ jobs:
 
       - run: npm ci
       - run: npm run typecheck --workspace @phd-ass/pwa
+      - run: npm run test:workflow --workspace @phd-ass/pwa
       - run: npm run build:pwa
 
   clinical-api:

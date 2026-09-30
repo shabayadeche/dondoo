@@ -41,6 +41,7 @@ from app.schemas import (
     ClinicalLookupsPayload,
     ClinicianLookupOption,
     DashboardSnapshot,
+    DashboardLanePayload,
     FacilityLookupOption,
     FacilityUnitLookupOption,
     FollowUpTask,
@@ -52,7 +53,9 @@ from app.schemas import (
     PatientRelationshipSuggestion,
     PatientLookupOption,
     WorkspaceRole,
+    RoleDashboardPayload,
 )
+from app.workflow import ensure_case_action_allowed
 
 
 MAX_CASE_IMAGE_BYTES = 10 * 1024 * 1024
@@ -253,6 +256,7 @@ def perform_case_action(
             return stored, "database"
 
         if action == "mark_ready_for_signoff":
+            ensure_case_action_allowed(action=action, status=draft.case_status, role=session.primary_role if session else None)
             if errors:
                 raise ValueError(_local_validation_summary(errors))
             next_payload["case_status"] = "ready_for_signoff"
@@ -270,10 +274,7 @@ def perform_case_action(
             return stored, "database"
 
         if action == "finalize":
-            if not session or session.primary_role != "endoscopist":
-                raise PermissionError("Only an endoscopist can finalize a report.")
-            if draft.case_status != "ready_for_signoff":
-                raise ValueError("A case must be marked ready for sign-off before it can be finalized.")
+            ensure_case_action_allowed(action=action, status=draft.case_status, role=session.primary_role if session else None)
             if errors:
                 raise ValueError(_local_validation_summary(errors))
 
@@ -306,10 +307,7 @@ def perform_case_action(
             return stored, "database"
 
         if action == "return_to_draft":
-            if not session or session.primary_role not in {"operations_admin", "workspace_admin"}:
-                raise PermissionError("Only a clinical operations admin can return a case to draft.")
-            if draft.case_status == "finalized":
-                raise ValueError("Finalized cases must be reopened instead of returned to draft directly.")
+            ensure_case_action_allowed(action=action, status=draft.case_status, role=session.primary_role if session else None)
             next_payload["case_status"] = "draft"
             next_payload["validation_summary"] = None
             stored = _upsert_database_case(db, ClinicalDraftCasePayload.model_validate(next_payload), actor=session, log_case_update=False)
@@ -317,13 +315,8 @@ def perform_case_action(
             return stored, "database"
 
         if action == "reopen":
-            if not session or session.primary_role not in {"operations_admin", "workspace_admin"}:
-                raise PermissionError("Only a clinical operations admin can reopen a finalized report.")
-            if draft.case_status != "finalized":
-                raise ValueError("Only finalized cases can be reopened.")
             reason = str(action_payload.get("reason") or "").strip()
-            if not reason:
-                raise ValueError("Enter a reopen reason before reopening a finalized case.")
+            ensure_case_action_allowed(action=action, status=draft.case_status, role=session.primary_role if session else None, reopen_reason=reason)
 
             next_payload["case_status"] = "draft_reopened"
             next_payload["finalized_at"] = None
@@ -729,6 +722,34 @@ def get_dashboard_snapshot(session: AuthenticatedSession | None = None) -> Dashb
         activeDrafts=sum(1 for item in cases if item.status in {"draft", "draft_reopened"}),
         openTasks=sum(1 for item in tasks if item.status in {"open", "in_progress"}),
         finalizedToday=sum(1 for item in cases if item.status == "finalized" and item.procedureDatetime[:10] == today_text),
+    )
+
+
+def get_role_dashboard(session: AuthenticatedSession) -> RoleDashboardPayload:
+    """Return the server-selected dashboard priority for the authenticated role."""
+    snapshot = get_dashboard_snapshot(session=session)
+    ready_count = sum(1 for item in list_cases(session=session) if item.status == "ready_for_signoff")
+    counts = {
+        "drafts": snapshot.activeDrafts,
+        "ready": ready_count,
+        "tasks": snapshot.openTasks,
+    }
+    if session.primary_role == "endoscopist":
+        order = ("ready", "drafts", "tasks")
+        headline = "Review ready reports first."
+    elif session.primary_role == "nurse":
+        order = ("drafts", "tasks", "ready")
+        headline = "Keep active documentation moving."
+    else:
+        order = ("tasks", "ready", "drafts")
+        headline = "Clear operational delays first."
+    labels = {"drafts": "Active drafts", "ready": "Ready for sign-off", "tasks": "Open follow-up"}
+    return RoleDashboardPayload(
+        role=session.primary_role,
+        headline=headline,
+        primaryLane=order[0],
+        lanes=[DashboardLanePayload(key=key, label=labels[key], count=counts[key]) for key in order],
+        finalizedToday=snapshot.finalizedToday,
     )
 
 

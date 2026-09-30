@@ -41,6 +41,7 @@ import type {
   ClinicianLookupOption,
   FacilityUnitLookupOption,
   ProcedureType,
+  RoleDashboardPayload,
   LoginPayload,
   MetaPayload,
   StartCasePayload,
@@ -49,11 +50,12 @@ import type {
   WorkflowStep,
   WorkspaceRole
 } from "./types";
+import { getCaseActionAvailability, getDashboardLaneOrder, getStartCaseReadiness, type DashboardLaneKey } from "./workflow";
+import { getRoleWorkspaceCopy, type WorkspaceSnapshot } from "./workspace";
 
 type ScreenKey = "dashboard" | "cases" | "tasks" | "new-procedure" | "case-detail";
 type StatusTone = "accent" | "success" | "warning" | "critical" | "neutral";
 type BannerTone = "success" | "error";
-type DashboardLaneKey = "drafts" | "ready" | "tasks";
 type SimpleOption = { value: string; label: string };
 type IconName =
   | "dashboard"
@@ -248,17 +250,6 @@ const caseAuthoringChecks: HelpDockItem[] = [
   { label: "Generate a preview before marking the case ready for sign-off." },
   { label: "Finalize only when structured findings, narrative preview, and follow-up tasks agree." }
 ];
-
-type WorkspaceSnapshot = {
-  drafts: number;
-  ready: number;
-  tasks: number;
-  finalizedToday: number;
-};
-
-function formatCountPhrase(count: number, singular: string, plural = `${singular}s`): string {
-  return `${count} ${count === 1 ? singular : plural}`;
-}
 
 function AppIcon({ name, size = 18 }: { name: IconName; size?: number }) {
   const commonProps = {
@@ -505,58 +496,6 @@ function QuickPhraseButtons({ onInsert }: { onInsert: (phrase: string) => void }
   );
 }
 
-function getRoleWorkspaceCopy(role: WorkspaceRole, snapshot: WorkspaceSnapshot): {
-  headerSummary: string;
-  headerNote: string;
-  dashboardEyebrow: string;
-  dashboardTitle: string;
-  dashboardSummary: string;
-  laneOrder: DashboardLaneKey[];
-} {
-  switch (role) {
-    case "endoscopist":
-      return {
-        headerSummary: snapshot.ready
-          ? `${formatCountPhrase(snapshot.ready, "report")} ready, ${formatCountPhrase(snapshot.drafts, "draft")} active, ${formatCountPhrase(snapshot.tasks, "follow-up task")} open.`
-          : `No reports are waiting for sign-off. ${formatCountPhrase(snapshot.drafts, "draft")} active, ${formatCountPhrase(snapshot.tasks, "follow-up task")} open.`,
-        headerNote: snapshot.ready
-          ? `Sign-off queue first. ${formatCountPhrase(snapshot.finalizedToday, "report")} finalized today.`
-          : "No reports are waiting for sign-off. Active drafting is next.",
-        dashboardEyebrow: "Endoscopist queue",
-        dashboardTitle: "Ready reports come first",
-        dashboardSummary: "Open the sign-off queue first, then return to active drafting and follow-up.",
-        laneOrder: ["ready", "drafts", "tasks"]
-      };
-    case "nurse":
-      return {
-        headerSummary: `${formatCountPhrase(snapshot.drafts, "draft")} active, ${formatCountPhrase(snapshot.tasks, "follow-up task")} open, ${formatCountPhrase(snapshot.ready, "report")} ready.`,
-        headerNote: "Documentation stays first. Follow-up and sign-off remain visible behind it.",
-        dashboardEyebrow: "Nursing queue",
-        dashboardTitle: "Keep drafts moving",
-        dashboardSummary: "Open active drafts first, then clear follow-up and ready reports from the same queue.",
-        laneOrder: ["drafts", "tasks", "ready"]
-      };
-    case "operations_admin":
-    case "workspace_admin":
-      return {
-        headerSummary: `${formatCountPhrase(snapshot.tasks, "follow-up task")} open, ${formatCountPhrase(snapshot.ready, "report")} ready, ${formatCountPhrase(snapshot.drafts, "draft")} active.`,
-        headerNote: "Queue health is the first check for this shift.",
-        dashboardEyebrow: "Operations queue",
-        dashboardTitle: "Clear delays first",
-        dashboardSummary: "Follow-up items lead the queue. Ready reports and active drafts stay behind them.",
-        laneOrder: ["tasks", "ready", "drafts"]
-      };
-    default:
-      return {
-        headerSummary: screenContent.dashboard.summary,
-        headerNote: "Keep drafting, sign-off, and follow-up in one queue.",
-        dashboardEyebrow: "Clinical queue",
-        dashboardTitle: "Queue overview",
-        dashboardSummary: "Start new work, clear active items, and keep the case trail intact.",
-        laneOrder: ["drafts", "ready", "tasks"]
-      };
-  }
-}
 const defaultMeta: MetaPayload = {
   appName: appConfig.appName,
   odooRecommendedModule: appConfig.odooRecommendedModule,
@@ -2116,6 +2055,7 @@ export default function App() {
           {activeScreen === "dashboard" ? (
             <DashboardView
               role={session.primaryRole}
+              dashboard={bundle?.dashboard}
               cases={sortedCases}
               tasks={sortedTasks}
               onOpenCases={() => handleNav("cases")}
@@ -2231,12 +2171,14 @@ export default function App() {
 
 function DashboardView({
   role,
+  dashboard,
   cases,
   tasks,
   onOpenCases,
   onOpenTasks
 }: {
   role: WorkspaceRole;
+  dashboard?: RoleDashboardPayload | undefined;
   cases: CaseSummary[];
   tasks: FollowUpTask[];
   onOpenCases: () => void;
@@ -2255,6 +2197,7 @@ function DashboardView({
     tasks: actionableTaskCount,
     finalizedToday
   });
+  const laneOrder = getDashboardLaneOrder(dashboard, roleCopy.laneOrder);
   const queueConfigs: Record<DashboardLaneKey, {
     eyebrow: string;
     title: string;
@@ -2349,7 +2292,7 @@ function DashboardView({
     <section className="dashboard-stack">
       <section className="panel dashboard-summary-panel">
         <div className="dashboard-queue-strip">
-          {roleCopy.laneOrder.map((lane) => {
+          {laneOrder.map((lane) => {
             const config = queueConfigs[lane];
             return (
               <DashboardQueueStripItem
@@ -2373,7 +2316,7 @@ function DashboardView({
       </section>
 
       <section className="dashboard-lane-grid">
-        {roleCopy.laneOrder.map((lane) => {
+        {laneOrder.map((lane) => {
           const config = queueConfigs[lane];
           return (
             <QueuePanel
@@ -2668,19 +2611,14 @@ function NewProcedureView({
     (caseForm.endoscopistUserId && caseForm.endoscopistUserId !== patientRelationshipSuggestion.endoscopistUserId)
   );
   const caseTypeLabel = caseForm.procedureType ? formatProcedureLabel(caseForm.procedureType) : "Case type required";
-  const canCreateDraft = Boolean(
-    caseForm.procedureType &&
-    caseForm.patientIdentifier.trim() &&
-    caseForm.procedureDatetime &&
-    resolvedFacilityCode &&
-    caseForm.endoscopistUserId
-  );
-  const startSteps = [
-    { label: "Patient", complete: Boolean(caseForm.patientIdentifier.trim()) },
-    { label: "Case type", complete: Boolean(caseForm.procedureType) },
-    { label: "Schedule", complete: Boolean(caseForm.procedureDatetime && resolvedFacilityCode) },
-    { label: "Team", complete: Boolean(caseForm.endoscopistUserId) }
-  ];
+  const startReadiness = getStartCaseReadiness({
+    patientIdentifier: caseForm.patientIdentifier,
+    procedureType: caseForm.procedureType,
+    procedureDatetime: caseForm.procedureDatetime,
+    facilityCode: resolvedFacilityCode,
+    endoscopistUserId: caseForm.endoscopistUserId
+  });
+  const { canCreateDraft, steps: startSteps } = startReadiness;
   return (
     <section className="view-stack">
         <article className="panel case-start-panel">
@@ -2995,10 +2933,8 @@ function CaseDetailView({
     return () => window.clearInterval(timer);
   }, [timerRunning, caseDraft.case_status]);
   const timerLabel = `${String(Math.floor(timerSeconds / 60)).padStart(2, "0")}:${String(timerSeconds % 60).padStart(2, "0")}`;
-  const canFinalize = session.primaryRole === "endoscopist" && caseDraft.case_status === "ready_for_signoff";
-  const canReturnToDraft = (session.primaryRole === "operations_admin" || session.primaryRole === "workspace_admin") &&
-    (caseDraft.case_status === "ready_for_signoff" || caseDraft.case_status === "draft_reopened");
-  const canReopen = (session.primaryRole === "operations_admin" || session.primaryRole === "workspace_admin") && caseDraft.case_status === "finalized";
+  const actionAvailability = getCaseActionAvailability(session.primaryRole, caseDraft.case_status);
+  const { canPreview, canMarkReady, canFinalize, canReturnToDraft, canReopen } = actionAvailability;
   const hasFinalizedPdf = caseDraft.case_status === "finalized";
   const openTaskCount = countCaseOpenTasks(caseDraft);
   const imageAttachments = caseDraft.image_attachments || [];
@@ -3983,7 +3919,7 @@ function CaseDetailView({
               className="icon-button"
               type="button"
               onClick={() => onRunAction("preview")}
-              disabled={!editable || caseActionLoading === "preview"}
+              disabled={!canPreview || caseActionLoading === "preview"}
               aria-label={caseActionLoading === "preview" ? "Generating preview" : "Generate preview"}
               title={caseActionLoading === "preview" ? "Generating preview" : "Generate preview"}
             >
@@ -3993,7 +3929,7 @@ function CaseDetailView({
               className="secondary-button"
               type="button"
               onClick={() => onRunAction("mark_ready_for_signoff")}
-              disabled={!editable || caseActionLoading === "mark_ready_for_signoff" || caseDraft.case_status === "ready_for_signoff"}
+              disabled={!canMarkReady || caseActionLoading === "mark_ready_for_signoff"}
             >
               <ButtonLabel icon="ready">{caseActionLoading === "mark_ready_for_signoff" ? "Updating..." : "Mark ready for sign-off"}</ButtonLabel>
             </button>
@@ -4261,7 +4197,7 @@ function NavigationButton({
   onClick: () => void;
 }) {
   return (
-    <button className={`nav-button${active ? " is-active" : ""}`} type="button" onClick={onClick}>
+    <button className={`nav-button${active ? " is-active" : ""}`} type="button" onClick={onClick} aria-current={active ? "page" : undefined}>
       <span className="nav-main">
         <span className="nav-icon" aria-hidden="true">
           <AppIcon name={icon} size={22} />
@@ -4290,7 +4226,7 @@ function MobileNavigationButton({
   onClick: () => void;
 }) {
   return (
-    <button className={`mobile-nav-button${active ? " is-active" : ""}`} type="button" onClick={onClick}>
+    <button className={`mobile-nav-button${active ? " is-active" : ""}`} type="button" onClick={onClick} aria-current={active ? "page" : undefined}>
       <span className="mobile-nav-icon" aria-hidden="true">
         <AppIcon name={icon} size={22} />
       </span>

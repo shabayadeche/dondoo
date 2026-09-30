@@ -91,6 +91,19 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
         self.assertEqual(response.headers["referrer-policy"], "no-referrer")
         self.assertEqual(response.headers["cache-control"], "no-store")
 
+    def test_dashboard_priorities_are_selected_by_authenticated_role(self) -> None:
+        endoscopist_headers = self._login("dr.njoroge", "test-secret")
+        endoscopist_dashboard = self.client.get("/api/dashboard", headers=endoscopist_headers)
+        self.assertEqual(endoscopist_dashboard.status_code, 200)
+        self.assertEqual(endoscopist_dashboard.json()["role"], "endoscopist")
+        self.assertEqual(endoscopist_dashboard.json()["primaryLane"], "ready")
+
+        nurse_headers = self._login("nurse.akinyi", "test-secret")
+        nurse_dashboard = self.client.get("/api/dashboard", headers=nurse_headers)
+        self.assertEqual(nurse_dashboard.status_code, 200)
+        self.assertEqual(nurse_dashboard.json()["role"], "nurse")
+        self.assertEqual(nurse_dashboard.json()["primaryLane"], "drafts")
+
     def test_can_finalize_case_and_download_pdf(self) -> None:
         headers = self._login("dr.njoroge", "test-secret")
         case_id = self._create_ready_case(headers)
@@ -113,6 +126,30 @@ class ClinicalApiAcceptanceTests(unittest.TestCase):
         history = history_response.json()
         self.assertEqual(len(history["revisions"]), 1)
         self.assertTrue(any(event["eventType"] == "report_finalized" for event in history["auditEvents"]))
+
+    def test_finalized_case_cannot_return_to_ready_for_signoff(self) -> None:
+        headers = self._login("dr.njoroge", "test-secret")
+        case_id = self._create_ready_case(headers)
+        self.assertEqual(
+            self.client.post(f"/api/cases/{case_id}/actions/mark_ready_for_signoff", headers=headers, json={}).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.post(f"/api/cases/{case_id}/actions/finalize", headers=headers, json={}).status_code,
+            200,
+        )
+
+        invalid_transition = self.client.post(
+            f"/api/cases/{case_id}/actions/mark_ready_for_signoff",
+            headers=headers,
+            json={},
+        )
+        self.assertEqual(invalid_transition.status_code, 400)
+        self.assertIn("Only a draft or reopened case", invalid_transition.json()["detail"])
+
+        current_case = self.client.get(f"/api/cases/{case_id}", headers=headers)
+        self.assertEqual(current_case.status_code, 200)
+        self.assertEqual(current_case.json()["case_status"], "finalized")
 
     def test_can_attach_fetch_and_remove_case_image(self) -> None:
         headers = self._login("dr.njoroge", "test-secret")

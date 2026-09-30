@@ -2048,7 +2048,7 @@ body {
 .queue-toolbar {
   display: grid;
   gap: 18px;
-  background: linear-gradient(135deg, rgba(255, 253, 248, 0.98), rgba(222, 236, 232, 0.48));
+  background: linear-gradient(135deg, var(--surface-solid), var(--accent-soft));
 }
 
 .queue-toolbar-controls {
@@ -2064,9 +2064,9 @@ body {
 .queue-result-count {
   flex: 0 0 auto;
   padding: 8px 10px;
-  border: 1px solid rgba(47, 123, 116, 0.16);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
   border-radius: 999px;
-  background: rgba(255, 253, 248, 0.72);
+  background: var(--surface-solid);
   color: var(--accent-deep);
   font-size: 0.82rem;
   font-weight: 700;
@@ -2074,7 +2074,37 @@ body {
 
 .queue-filter-row {
   padding-top: 4px;
-  border-top: 1px solid rgba(38, 47, 59, 0.07);
+  border-top: 1px solid var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  button,
+  input,
+  select,
+  textarea,
+  .status-chip,
+  .nav-button.is-active,
+  .mobile-nav-button.is-active {
+    border: 1px solid CanvasText;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid Highlight;
+  }
 }
 
 .case-start-panel {
