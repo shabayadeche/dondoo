@@ -80,7 +80,9 @@ jobs:
           test -n "$AWS_DEPLOY_ROLE_ARN"
           test -n "$PRODUCTION_INSTANCE_ID"
           jq -n --rawfile inspection <(cat <<'REMOTE'
-          set -euo pipefail
+          # AWS-RunShellScript executes commands with /bin/sh on this host.
+          # Keep this read-only inspection POSIX-shell compatible.
+          set -eu
           echo '== Odoo process managers =='
           systemctl list-units --type=service --all --no-legend 'odoo*' || true
           command -v docker >/dev/null && docker ps --format 'docker {{.Names}} | {{.Image}} | {{.Ports}}' || true
